@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:nutriapp/views/cadastros/cadastro_alimento.dart';
 import 'package:nutriapp/views/cadastros/cadastro_cardapio.dart';
 import 'package:nutriapp/views/cadastros/cadastro_usuario.dart';
-import 'package:nutriapp/views/formas/circulo.dart';
-import 'package:nutriapp/views/formas/quadrado.dart';
-import 'package:nutriapp/views/formas/retangulo.dart';
 
 class Cadastros extends StatefulWidget {
   const Cadastros({super.key});

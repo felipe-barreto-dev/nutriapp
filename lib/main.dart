@@ -16,13 +16,13 @@ class CalculadoraGeometrica extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: const FormasGeometricas(title: 'Nutriapp'),
+        home: const Home(title: 'Nutriapp'),
         routes: Rotas.carregar());
   }
 }
 
-class FormasGeometricas extends StatelessWidget {
-  const FormasGeometricas({super.key, required this.title});
+class Home extends StatelessWidget {
+  const Home({super.key, required this.title});
 
   final String title;
 

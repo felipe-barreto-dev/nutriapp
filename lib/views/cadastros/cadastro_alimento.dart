@@ -1,6 +1,6 @@
 import 'package:nutriapp/model/FormaGeometrica.dart';
 import 'package:nutriapp/util/entrada_numero.dart';
-import 'package:nutriapp/views/formas/tela_padrao.dart';
+import 'package:nutriapp/views/tela_padrao.dart';
 import 'package:flutter/material.dart';
 
 import '../../routes/rotas.dart';

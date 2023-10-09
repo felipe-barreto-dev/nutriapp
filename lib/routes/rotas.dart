@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:nutriapp/views/cadastros/cadastros.dart';
+import 'package:nutriapp/views/compartilhamentos/compartilhamentos.dart';
+import 'package:nutriapp/views/consultas/consultas.dart';
+import 'package:nutriapp/views/creditos.dart';
+import 'package:nutriapp/views/login.dart';
 
 import '../main.dart';
-import '../views/formas/circulo.dart';
-import '../views/formas/quadrado.dart';
-import '../views/formas/retangulo.dart';
-import '../views/formas/trapezio.dart';
-import '../views/formas/triangulo.dart';
-import '../views/resultado.dart';
 
 class Rotas {
   static Map<String, Widget Function(BuildContext)> carregar() {
     return {
       '/cadastros': (context) => const Cadastros(),
-      '/consultas': (context) => const Retangulo(),
-      '/compartilhamentos': (context) => const Triangulo(),
-      '/creditos': (context) => const Circulo(),
-      '/login': (context) => const Trapezio(),
-      '/principal': (context) => const CalculadoraGeometrica()
+      '/consultas': (context) => const Consultas(),
+      '/compartilhamentos': (context) => const Compartilhamentos(),
+      '/creditos': (context) => const Creditos(),
+      '/login': (context) => const Login(),
+      '/principal': (context) => const Home(title: 'NutriApp')
     };
   }
 
