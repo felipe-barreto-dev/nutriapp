@@ -26,6 +26,7 @@ class CompartilhamentoAlimentoState extends State<CompartilhamentoAlimento> {
   @override
   Widget build(BuildContext context) {
     return TelaPadrao('Compartilhamento de alimento', <Widget>[
+      const Image(width: double.infinity, image: AssetImage('assets/images/logo-app.png')),
       const GraficoReferencia('assets/images/area-circulo.png'),
       CaixaDeNumero('Raio do círculo', _raioController),
       BotaoCalcular("Calcular", _calcularAreaCompartilhamentoAlimento)

@@ -15,7 +15,7 @@ class CirculoState extends State<Cadastros> {
 
   final List<Widget> _telas = [
     const CadastroUsuario(),
-    const CadastroAlimento(),
+    // const CadastroAlimento(),
     const CadastroCardapio(),
   ]; // Lista de telas para os diferentes tipos de cadastro
 
@@ -34,10 +34,10 @@ class CirculoState extends State<Cadastros> {
           });
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Usuário',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.person),
+          //   label: 'Usuário',
+          // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.fastfood),
             label: 'Alimento',

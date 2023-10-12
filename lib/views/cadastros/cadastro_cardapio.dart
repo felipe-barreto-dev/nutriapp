@@ -28,7 +28,7 @@ class CadastroCardapioState extends State<CadastroCardapio> {
     return TelaPadrao('Cadastro de cardápio', <Widget>[
       const GraficoReferencia('assets/images/area-circulo.png'),
       CaixaDeNumero('Raio do círculo', _raioController),
-      BotaoCalcular("Calcular", _calcularAreaCadastroCardapio)
+      BotaoCalcular("Calcular", _calcularAreaCadastroCardapio),
     ]);
   }
 }
