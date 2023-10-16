@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:nutriapp/helpers/database_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:nutriapp/util/foto_perfil.dart';
 
 class CadastroUsuario extends StatefulWidget {
   const CadastroUsuario({super.key});

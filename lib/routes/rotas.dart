@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nutriapp/views/cadastros/cadastros.dart';
-import 'package:nutriapp/views/compartilhamentos/compartilhamentos.dart';
-import 'package:nutriapp/views/consultas/consultas.dart';
+import 'package:nutriapp/views/cadastros/cadastro_usuario.dart';
 import 'package:nutriapp/views/creditos.dart';
 import 'package:nutriapp/views/login.dart';
 
@@ -10,12 +8,10 @@ import '../main.dart';
 class Rotas {
   static Map<String, Widget Function(BuildContext)> carregar() {
     return {
-      '/cadastros': (context) => const Cadastros(),
-      '/consultas': (context) => const Consultas(),
-      '/compartilhamentos': (context) => const Compartilhamentos(),
+      '/cadastro-usuario': (context) => const CadastroUsuario(),
       '/creditos': (context) => const Creditos(),
       '/login': (context) => const Login(),
-      '/principal': (context) => const Home(title: 'NutriApp')
+      '/principal': (context) => const Home()
     };
   }
 
