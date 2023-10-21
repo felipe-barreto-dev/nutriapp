@@ -11,14 +11,13 @@ class CadastroUsuario extends StatefulWidget {
 class CadastroUsuarioState extends State<CadastroUsuario> {
   // Retorna todos os registros da tabela
   List<Map<String, dynamic>> _registros = [];
-  late DateTime _selectedDate;
 
   // Aparece enquanto os dados não são carregados
   bool _isLoading = true;
 
   //Essa função retorna todos os registros da tabela
   void _exibeTodosRegistros() async {
-    final data = await Database.exibeTodosRegistros();
+    final data = await DatabaseHelper.exibeTodosUsuarios();
     setState(() {
       _registros = data;
       _isLoading = false;
@@ -28,12 +27,15 @@ class CadastroUsuarioState extends State<CadastroUsuario> {
   @override
   void initState() {
     super.initState();
-    //Atualiza a lista de registros quando o aplicativo é iniciado
+    _selectedDate = DateTime.now();
     _exibeTodosRegistros();
   }
 
-  final TextEditingController _tituloController = TextEditingController();
-  final TextEditingController _descricaoController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _birthdayDateController = TextEditingController();
+  final TextEditingController _photoController = TextEditingController();
+
+  late DateTime _selectedDate;
 
   // Esta função será acionada quando o botão for pressionado
   // Também será acionado quando um item for inserido, atualizado ou removido
@@ -43,22 +45,27 @@ class CadastroUsuarioState extends State<CadastroUsuario> {
       // id != null -> Atualizando um item existente
       final registroExistente =
           _registros.firstWhere((element) => element['id'] == id);
-      _tituloController.text = registroExistente['title'];
-      _descricaoController.text = registroExistente['description'];
+          _nameController.text = registroExistente['nome'];
+      
+          final existingDate = registroExistente['data_nascimento'];
+          _selectedDate = DateTime.parse(existingDate);
+          _birthdayDateController.text = existingDate;
+      
+          _photoController.text = registroExistente['foto'];
     }
 
-
-    // Função para exibir o seletor de data
     Future<void> _selectDate(BuildContext context) async {
       final DateTime? picked = await showDatePicker(
         context: context,
-        initialDate: _selectedDate ?? DateTime.now(),
+        initialDate: _selectedDate,
         firstDate: DateTime(2000),
         lastDate: DateTime(2101),
       );
-      if (picked != null && picked != _selectedDate) {
+      if (picked != null) {
         setState(() {
           _selectedDate = picked;
+          _birthdayDateController.text =
+              "${picked.toLocal()}".split(' ')[0];
         });
       }
     }
@@ -80,7 +87,7 @@ class CadastroUsuarioState extends State<CadastroUsuario> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   TextField(
-                    controller: _tituloController,
+                    controller: _nameController,
                     decoration: const InputDecoration(hintText: 'Nome'),
                   ),
                   const SizedBox(
@@ -103,15 +110,28 @@ class CadastroUsuarioState extends State<CadastroUsuario> {
                   //   height: 10,
                   // ),
                   TextField(
-                    controller: _tituloController,
-                    decoration: const InputDecoration(hintText: 'Nome'),
+                    controller: _photoController,
+                    decoration: const InputDecoration(hintText: 'Foto'),
                   ),
                   const SizedBox(
                     height: 10,
                   ),
-                  TextField(
-                    controller: _descricaoController,
-                    decoration: const InputDecoration(hintText: 'Descrição'),
+                  ElevatedButton(
+                    onPressed: () => _selectDate(context), // Add this line
+                    child: Text('Selecione uma data'),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  TextFormField(
+                    controller: _birthdayDateController,
+                    decoration: InputDecoration(
+                      hintText: 'Data de Nascimento',
+                      suffixIcon: IconButton(
+                        onPressed: () => _selectDate(context),
+                        icon: Icon(Icons.calendar_today),
+                      ),
+                    ),
                   ),
                   const SizedBox(
                     height: 20,
@@ -128,13 +148,14 @@ class CadastroUsuarioState extends State<CadastroUsuario> {
                       }
 
                       // Limpa os campos
-                      _tituloController.text = '';
-                      _descricaoController.text = '';
+                      _nameController.text = '';
+                      _birthdayDateController.text = '';
+                      _photoController.text = '';
 
                       // Fecha o modal de inserção/alteração
                       Navigator.of(context).pop();
                     },
-                    child: Text(id == null ? 'Novo registro' : 'Atualizar'),
+                    child: Text(id == null ? 'Novo usuário' : 'Atualizar'),
                   )
                 ],
               ),
@@ -143,27 +164,26 @@ class CadastroUsuarioState extends State<CadastroUsuario> {
 
   // Insere um novo registro
   Future<void> _insereRegistro() async {
-    await Database.insereRegistro(
-        _tituloController.text, _descricaoController.text);
+    await DatabaseHelper.insereUsuario(
+        _nameController.text, _selectedDate, _photoController.text);
     _exibeTodosRegistros();
   }
 
   // Atualiza um registro
   Future<void> _atualizaRegistro(int id) async {
-    await Database.atualizaRegistro(
-        id, _tituloController.text, _descricaoController.text);
+    await DatabaseHelper.atualizaUsuario(
+        id, _nameController.text, _selectedDate, _photoController.text);
     _exibeTodosRegistros();
   }
 
   // Remove um registro
   void _removeRegistro(int id) async {
-    await Database.removeRegistro(id);
+    await DatabaseHelper.removeUsuario(id);
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Registro removido com sucesso!'),
+      content: Text('Usuário removido com sucesso!'),
     ));
     _exibeTodosRegistros();
   }
-      
 
   @override
   Widget build(BuildContext context) {
@@ -178,8 +198,8 @@ class CadastroUsuarioState extends State<CadastroUsuario> {
                 color: Color.fromARGB(255, 237, 250, 211),
                 margin: const EdgeInsets.all(15),
                 child: ListTile(
-                    title: Text(_registros[index]['title']),
-                    subtitle: Text(_registros[index]['description']),
+                    title: Text(_registros[index]['nome']),
+                    subtitle: Text(_registros[index]['data_nascimento']),
                     trailing: SizedBox(
                       width: 100,
                       child: Row(

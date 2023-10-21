@@ -17,11 +17,12 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
   late DateTime _selectedDate;
 
   // Aparece enquanto os dados não são carregados
-  bool _isLoading = true;
+  bool _isLoading = false;
 
   //Essa função retorna todos os registros da tabela
   void _exibeTodosRegistros() async {
-    final data = await Database.exibeTodosRegistros();
+    final data = await DatabaseHelper.exibeTodosAlimentos();
+    print(data);
     setState(() {
       _registros = data;
       _isLoading = false;
@@ -35,8 +36,10 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
     _exibeTodosRegistros();
   }
 
-  final TextEditingController _tituloController = TextEditingController();
-  final TextEditingController _descricaoController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _categoryController = TextEditingController();
+  final TextEditingController _photoController = TextEditingController();
+  final TextEditingController _typeController = TextEditingController();
 
   // Esta função será acionada quando o botão for pressionado
   // Também será acionado quando um item for inserido, atualizado ou removido
@@ -46,8 +49,10 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
       // id != null -> Atualizando um item existente
       final registroExistente =
           _registros.firstWhere((element) => element['id'] == id);
-      _tituloController.text = registroExistente['title'];
-      _descricaoController.text = registroExistente['description'];
+      _nameController.text = registroExistente['nome'];
+      _categoryController.text = registroExistente['categoria'];
+      _photoController.text = registroExistente['foto'];
+      _typeController.text = registroExistente['tipo'];
     }
 
 
@@ -82,13 +87,6 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  TextField(
-                    controller: _tituloController,
-                    decoration: const InputDecoration(hintText: 'Nome'),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
                   // ProfilePicture(
                   // size: 100.0,
                   // onPictureSelected: (File image) {
@@ -106,15 +104,29 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
                   //   height: 10,
                   // ),
                   TextField(
-                    controller: _tituloController,
+                    controller: _nameController,
                     decoration: const InputDecoration(hintText: 'Nome'),
                   ),
                   const SizedBox(
                     height: 10,
                   ),
                   TextField(
-                    controller: _descricaoController,
-                    decoration: const InputDecoration(hintText: 'Descrição'),
+                    controller: _photoController,
+                    decoration: const InputDecoration(hintText: 'Foto'),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  TextField(
+                    controller: _categoryController,
+                    decoration: const InputDecoration(hintText: 'Categoria'),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  TextField(
+                    controller: _typeController,
+                    decoration: const InputDecoration(hintText: 'Tipo'),
                   ),
                   const SizedBox(
                     height: 20,
@@ -131,13 +143,15 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
                       }
 
                       // Limpa os campos
-                      _tituloController.text = '';
-                      _descricaoController.text = '';
+                      _nameController.text = '';
+                      _categoryController.text = '';
+                      _typeController.text = '';
+                      _photoController.text = '';
 
                       // Fecha o modal de inserção/alteração
                       Navigator.of(context).pop();
                     },
-                    child: Text(id == null ? 'Novo registro' : 'Atualizar'),
+                    child: Text(id == null ? 'Novo alimento' : 'Atualizar'),
                   )
                 ],
               ),
@@ -146,23 +160,23 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
 
   // Insere um novo registro
   Future<void> _insereRegistro() async {
-    await Database.insereRegistro(
-        _tituloController.text, _descricaoController.text);
+    await DatabaseHelper.insereAlimento(
+        _nameController.text, _photoController.text, _categoryController.text, _typeController.text);
     _exibeTodosRegistros();
   }
 
   // Atualiza um registro
   Future<void> _atualizaRegistro(int id) async {
-    await Database.atualizaRegistro(
-        id, _tituloController.text, _descricaoController.text);
+    await DatabaseHelper.atualizaAlimento(
+        id, _nameController.text, _photoController.text, _categoryController.text, _typeController.text);
     _exibeTodosRegistros();
   }
 
   // Remove um registro
   void _removeRegistro(int id) async {
-    await Database.removeRegistro(id);
+    await DatabaseHelper.removeAlimento(id);
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Registro removido com sucesso!'),
+      content: Text('Alimento removido com sucesso!'),
     ));
     _exibeTodosRegistros();
   }
@@ -181,8 +195,8 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
                 color: Color.fromARGB(255, 237, 250, 211),
                 margin: const EdgeInsets.all(15),
                 child: ListTile(
-                    title: Text(_registros[index]['title']),
-                    subtitle: Text(_registros[index]['description']),
+                    title: Text(_registros[index]['nome']),
+                    subtitle: Text(_registros[index]['categoria']),
                     trailing: SizedBox(
                       width: 100,
                       child: Row(

@@ -1,6 +1,8 @@
+import 'dart:io';
 
 import 'package:nutriapp/helpers/database_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:nutriapp/util/foto_perfil.dart';
 
 class CadastroCardapio extends StatefulWidget {
   const CadastroCardapio({super.key});
@@ -19,7 +21,7 @@ class CadastroCardapioState extends State<CadastroCardapio> {
 
   //Essa função retorna todos os registros da tabela
   void _exibeTodosRegistros() async {
-    final data = await Database.exibeTodosRegistros();
+    final data = await DatabaseHelper.exibeTodosAlimentos();
     setState(() {
       _registros = data;
       _isLoading = false;
@@ -33,8 +35,10 @@ class CadastroCardapioState extends State<CadastroCardapio> {
     _exibeTodosRegistros();
   }
 
-  final TextEditingController _tituloController = TextEditingController();
-  final TextEditingController _descricaoController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _categoryController = TextEditingController();
+  final TextEditingController _photoController = TextEditingController();
+  final TextEditingController _typeController = TextEditingController();
 
   // Esta função será acionada quando o botão for pressionado
   // Também será acionado quando um item for inserido, atualizado ou removido
@@ -44,8 +48,10 @@ class CadastroCardapioState extends State<CadastroCardapio> {
       // id != null -> Atualizando um item existente
       final registroExistente =
           _registros.firstWhere((element) => element['id'] == id);
-      _tituloController.text = registroExistente['title'];
-      _descricaoController.text = registroExistente['description'];
+      _nameController.text = registroExistente['nome'];
+      _categoryController.text = registroExistente['categoria'];
+      _photoController.text = registroExistente['foto'];
+      _typeController.text = registroExistente['tipo'];
     }
 
 
@@ -81,7 +87,7 @@ class CadastroCardapioState extends State<CadastroCardapio> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   TextField(
-                    controller: _tituloController,
+                    controller: _nameController,
                     decoration: const InputDecoration(hintText: 'Nome'),
                   ),
                   const SizedBox(
@@ -104,15 +110,29 @@ class CadastroCardapioState extends State<CadastroCardapio> {
                   //   height: 10,
                   // ),
                   TextField(
-                    controller: _tituloController,
+                    controller: _nameController,
                     decoration: const InputDecoration(hintText: 'Nome'),
                   ),
                   const SizedBox(
                     height: 10,
                   ),
                   TextField(
-                    controller: _descricaoController,
-                    decoration: const InputDecoration(hintText: 'Descrição'),
+                    controller: _photoController,
+                    decoration: const InputDecoration(hintText: 'Foto'),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  TextField(
+                    controller: _categoryController,
+                    decoration: const InputDecoration(hintText: 'Categoria'),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  TextField(
+                    controller: _typeController,
+                    decoration: const InputDecoration(hintText: 'Tipo'),
                   ),
                   const SizedBox(
                     height: 20,
@@ -129,8 +149,10 @@ class CadastroCardapioState extends State<CadastroCardapio> {
                       }
 
                       // Limpa os campos
-                      _tituloController.text = '';
-                      _descricaoController.text = '';
+                      _nameController.text = '';
+                      _categoryController.text = '';
+                      _typeController.text = '';
+                      _photoController.text = '';
 
                       // Fecha o modal de inserção/alteração
                       Navigator.of(context).pop();
@@ -144,21 +166,21 @@ class CadastroCardapioState extends State<CadastroCardapio> {
 
   // Insere um novo registro
   Future<void> _insereRegistro() async {
-    await Database.insereRegistro(
-        _tituloController.text, _descricaoController.text);
+    await DatabaseHelper.insereAlimento(
+        _nameController.text, _photoController.text, _categoryController.text, _typeController.text);
     _exibeTodosRegistros();
   }
 
   // Atualiza um registro
   Future<void> _atualizaRegistro(int id) async {
-    await Database.atualizaRegistro(
-        id, _tituloController.text, _descricaoController.text);
+    await DatabaseHelper.atualizaAlimento(
+        id, _nameController.text, _photoController.text, _categoryController.text, _typeController.text);
     _exibeTodosRegistros();
   }
 
   // Remove um registro
   void _removeRegistro(int id) async {
-    await Database.removeRegistro(id);
+    await DatabaseHelper.removeAlimento(id);
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
       content: Text('Registro removido com sucesso!'),
     ));
