@@ -1,26 +1,32 @@
+import 'package:nutriapp/login/login.bindings.dart';
 import 'package:nutriapp/routes/rotas.dart';
 import 'package:nutriapp/util/botao.dart';
 import 'package:flutter/material.dart';
 import 'package:nutriapp/views/cadastros/cadastro_alimento.dart';
 import 'package:nutriapp/views/cadastros/cadastro_cardapio.dart';
 import 'package:nutriapp/views/cadastros/cadastro_usuario.dart';
-import 'package:nutriapp/views/creditos.dart';
+import 'package:nutriapp/views/creditos.dart'; 
+import 'package:get/get.dart';
+import 'package:nutriapp/login/login.view.dart';
+import 'package:nutriapp/views/login.dart';
 
 void main() {
-  runApp(const CalculadoraGeometrica());
+  runApp(const StartApp());
 }
 
-class CalculadoraGeometrica extends StatelessWidget {
-  const CalculadoraGeometrica({super.key});
+class StartApp extends StatelessWidget {
+  const StartApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
+      initialBinding: LoginBindings(),
+        debugShowCheckedModeBanner: false,
         title: 'Nutriapp',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: const Home(),
+        home: const LoginView(),
         routes: Rotas.carregar());
   }
 }
