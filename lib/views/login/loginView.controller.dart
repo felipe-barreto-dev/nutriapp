@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nutriapp/home/home.view.dart';
 import 'package:nutriapp/main.dart'; 
 
 class LoginController extends GetxController{
@@ -24,8 +23,6 @@ class LoginController extends GetxController{
   }
 
   void checkPassword(){
-    print('Login');
-
     switch(passwordInput.text){
       case password: 
         login();
@@ -39,7 +36,7 @@ class LoginController extends GetxController{
   } 
   
   void login(){
-    Get.to(HomeView());
+    Get.to(const Home());
   }
 
   void printError(String error){

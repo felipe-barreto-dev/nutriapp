@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nutriapp/login/loginView.controller.dart';
+import 'package:nutriapp/views/login/loginView.controller.dart';
 
 class LoginButton extends GetView<LoginController> {
   const LoginButton({super.key});

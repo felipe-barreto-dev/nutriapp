@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:nutriapp/login/loginView.controller.dart'; 
+import 'package:nutriapp/views/login/loginView.controller.dart'; 
 
 class LoginBindings extends Bindings{
   @override

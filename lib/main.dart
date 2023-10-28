@@ -1,14 +1,12 @@
-import 'package:nutriapp/login/login.bindings.dart';
+import 'package:nutriapp/views/login/login.bindings.dart';
 import 'package:nutriapp/routes/rotas.dart';
-import 'package:nutriapp/util/botao.dart';
 import 'package:flutter/material.dart';
 import 'package:nutriapp/views/cadastros/cadastro_alimento.dart';
 import 'package:nutriapp/views/cadastros/cadastro_cardapio.dart';
 import 'package:nutriapp/views/cadastros/cadastro_usuario.dart';
 import 'package:nutriapp/views/creditos.dart'; 
 import 'package:get/get.dart';
-import 'package:nutriapp/login/login.view.dart';
-import 'package:nutriapp/views/login.dart';
+import 'package:nutriapp/views/login/login.view.dart';
 
 void main() {
   runApp(const StartApp());
@@ -45,11 +43,9 @@ class HomeState extends State<Home> {
   final String emailUsuario = "seu.email@example.com";
 
   final List<Widget> _telas = [
-    // const CadastroUsuario(),
     const CadastroAlimento(),
     const CadastroCardapio(),
   ]; // Lista de telas para os diferentes tipos de cadastro
-
 
   @override
   Widget build(BuildContext context) {
@@ -124,10 +120,6 @@ class HomeState extends State<Home> {
           });
         },
         items: const [
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.person),
-          //   label: 'Usuário',
-          // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.fastfood),
             label: 'Alimento',

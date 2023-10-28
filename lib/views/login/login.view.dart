@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nutriapp/login/loginView.controller.dart';
-import 'package:nutriapp/login/widgets/emailField.widget.dart';
-import 'package:nutriapp/login/widgets/passwordField.widget.dart';
+import 'package:nutriapp/views/login/loginView.controller.dart';
+import 'package:nutriapp/views/login/widgets/emailField.widget.dart';
+import 'package:nutriapp/views/login/widgets/passwordField.widget.dart';
 import 'widgets/loginButton.widget.dart';
 
 class LoginView extends GetView<LoginController> {
@@ -25,13 +25,13 @@ class LoginView extends GetView<LoginController> {
           SizedBox(
             height: Get.height / 3,
             ),
-          EmailField(),
-          SizedBox(height: 27),
-          PasswordField(),
-          SizedBox(height: 27),
-          Divider(),
-          SizedBox(height: 27), 
-          LoginButton(), 
+          const EmailField(),
+          const SizedBox(height: 27),
+          const PasswordField(),
+          const SizedBox(height: 27),
+          const Divider(),
+          const SizedBox(height: 27), 
+          const LoginButton(), 
           ],
       );
   }
