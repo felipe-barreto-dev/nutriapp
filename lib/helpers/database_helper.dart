@@ -198,6 +198,51 @@ class DatabaseHelper {
     return id;
   }
 
+    // Atualiza um registro de cardápio
+  static Future<int> atualizaCardapio(
+    int id,
+    int idUsuario,
+    int cafe1Id,
+    int cafe2Id,
+    int cafe3Id,
+    int almoco1Id,
+    int almoco2Id,
+    int almoco3Id,
+    int almoco4Id,
+    int almoco5Id,
+    int janta1Id,
+    int janta2Id,
+    int janta3Id,
+    int janta4Id,
+  ) async {
+    final database = await DatabaseHelper.database();
+
+    final data = {
+      'id_usuario': idUsuario,
+      'cafe1_id': cafe1Id,
+      'cafe2_id': cafe2Id,
+      'cafe3_id': cafe3Id,
+      'almoco1_id': almoco1Id,
+      'almoco2_id': almoco2Id,
+      'almoco3_id': almoco3Id,
+      'almoco4_id': almoco4Id,
+      'almoco5_id': almoco5Id,
+      'janta1_id': janta1Id,
+      'janta2_id': janta2Id,
+      'janta3_id': janta3Id,
+      'janta4_id': janta4Id,
+    };
+
+    final result = await database.update('cardapio', data, where: "id = ?", whereArgs: [id]);
+    return result;
+  }
+
+  // Retorna todos os registros de cardápio
+  static Future<List<Map<String, dynamic>>> exibeTodosCardapios() async {
+    final database = await DatabaseHelper.database();
+    return database.query('cardapio', orderBy: "id");
+  }
+
   // Obtém as informações do cardápio
   static Future<Map<String, dynamic>?> retornaCardapio(int idCardapio) async {
     final database = await DatabaseHelper.database();
@@ -208,4 +253,12 @@ class DatabaseHelper {
     return null;
   }
 
+  static Future<void> removeCardapio(int id) async {
+    final database = await DatabaseHelper.database();
+    try {
+      await database.delete("cardapio", where: "id = ?", whereArgs: [id]);
+    } catch (err) {
+      debugPrint("Ocorreu algum erro ao remover o cardápio: $err");
+    }
+  }
 }

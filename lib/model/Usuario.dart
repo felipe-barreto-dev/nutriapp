@@ -1,22 +1,31 @@
 class Usuario {
-  final String _nome = "";
-  final DateTime _dataNascimento = DateTime(1);
-  final String _foto = "";
+  final int id;
+  final String nome;
+  final DateTime dataNascimento;
+  final String foto;
 
-  get nome {
-    return _nome;
+  Usuario({
+    required this.id,
+    required this.nome,
+    required this.dataNascimento,
+    required this.foto,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'nome': nome,
+      'data_nascimento': dataNascimento.toIso8601String(),
+      'foto': foto,
+    };
   }
 
-  get dataNascimento {
-    return _dataNascimento;
+  factory Usuario.fromMap(Map<String, dynamic> map) {
+    return Usuario(
+      id: map['id'],
+      nome: map['nome'],
+      dataNascimento: DateTime.parse(map['data_nascimento']),
+      foto: map['foto'],
+    );
   }
-
-  get foto {
-    return _foto;
-  }
-
-  Usuario.criar({required String nome, required DateTime dataNascimento, required String foto}) {
-    //teste
-  }
-
 }
