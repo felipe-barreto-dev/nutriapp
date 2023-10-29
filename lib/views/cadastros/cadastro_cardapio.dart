@@ -13,7 +13,7 @@ class CadastroCardapioState extends State<CadastroCardapio> {
   List<Map<String, dynamic>> _alimentos = [];
   List<Map<String, dynamic>> _usuarios = [];
   bool _isLoading = false;
-  int id_usuario = 0;
+  int? id_usuario = null;
   int cafe1 = 0;
   int cafe2 = 0;
   int cafe3 = 0;
@@ -70,7 +70,6 @@ class CadastroCardapioState extends State<CadastroCardapio> {
       return categoriaAlimento == categoria;
     }).toList();
 
-    // Adicione a opção vazia ou "Selecione uma opção" como o primeiro item
     alimentosFiltrados.insert(0, {
       'id': 0,
       'nome': 'Selecione uma opção',
@@ -79,8 +78,8 @@ class CadastroCardapioState extends State<CadastroCardapio> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 10),
-        Text(label, style: TextStyle(fontSize: 16)),
+        const SizedBox(height: 10),
+        Text(label, style: const TextStyle(fontSize: 16)),
         DropdownButton<int>(
           value: selectedValue,
           items: alimentosFiltrados.map((alimento) {
@@ -113,6 +112,12 @@ class CadastroCardapioState extends State<CadastroCardapio> {
 
   void _exibeTodosUsuarios() async {
     final data = await DatabaseHelper.exibeTodosUsuarios();
+
+    data.insert(0, {
+      'id': 0,
+      'nome': 'Selecione uma opção',
+    });
+
     setState(() {
       _usuarios = data;
       _isLoading = false;
@@ -132,7 +137,7 @@ class CadastroCardapioState extends State<CadastroCardapio> {
       almoco4 = registroExistente['almoco4_id'];
       almoco5 = registroExistente['almoco5_id'];
       janta1 = registroExistente['janta1_id'];
-      janta2 = registroExistente['janta2_id'];
+      janta2 = registroExistente['janta2_id']; 
       janta3 = registroExistente['janta3_id'];
       janta4 = registroExistente['janta4_id'];
     }
@@ -152,22 +157,29 @@ class CadastroCardapioState extends State<CadastroCardapio> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-              DropdownButton<int>(
-                value: id_usuario,
-                items: _usuarios.map((user) {
-                  return DropdownMenuItem<int>(
-                    value: user['id'],
-                    child: Text(user['nome']),
-                  );
-                }).toList(),
-                onChanged: (newValue) {
-                  setState(() {
-                    id_usuario = newValue!;
-                  });
-                },
-              ),
-                SizedBox(height: 20),
-                Text('Café', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const Text('Usuário', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                DropdownButton<int>(
+                  value: id_usuario ?? 0, // Use 0 como valor inicial se id_usuario for nulo
+                  items: [
+                    const DropdownMenuItem<int>(
+                      value: 0,
+                      child: Text('Selecione um usuário'),
+                    ),
+                    ..._usuarios.map((user) {
+                      return DropdownMenuItem<int>(
+                        value: user['id'],
+                        child: Text(user['nome']),
+                      );
+                    }).toList(),
+                  ],
+                  onChanged: (newValue) {
+                    setState(() {
+                      id_usuario = newValue == 0 ? null : newValue; // Define como nulo se o valor for 0
+                    });
+                  },
+                ),
+                const SizedBox(height: 20),
+                const Text('Café', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 _buildCafeSelector('Café 1', cafe1, 'Café', (newValue) {
                   setState(() {
                     cafe1 = newValue!;
@@ -183,8 +195,8 @@ class CadastroCardapioState extends State<CadastroCardapio> {
                     cafe3 = newValue!;
                   });
                 }),
-                SizedBox(height: 20),
-                Text('Almoço', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 20),
+                const Text('Almoço', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 _buildCafeSelector('Almoço 1', almoco1, 'Almoço', (newValue) {
                   setState(() {
                     almoco1 = newValue!;
@@ -210,8 +222,8 @@ class CadastroCardapioState extends State<CadastroCardapio> {
                     almoco5 = newValue!;
                   });
                 }),
-                SizedBox(height: 20),
-                Text('Janta', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 20),
+                const Text('Janta', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 _buildCafeSelector('Janta 1', janta1, 'Janta', (newValue) {
                   setState(() {
                     janta1 = newValue!;
@@ -232,7 +244,7 @@ class CadastroCardapioState extends State<CadastroCardapio> {
                     janta4 = newValue!;
                   });
                 }),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () async {
                     if (id == null) {
@@ -260,7 +272,7 @@ class CadastroCardapioState extends State<CadastroCardapio> {
                   },
                   child: Text(id == null ? 'Novo alimento' : 'Atualizar'),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).pop();
@@ -277,7 +289,7 @@ class CadastroCardapioState extends State<CadastroCardapio> {
 
   Future<void> _insereRegistro() async {
     await DatabaseHelper.insereCardapio(
-      id_usuario,
+      id_usuario!,
       cafe1,
       cafe2,
       cafe3,
@@ -297,7 +309,7 @@ class CadastroCardapioState extends State<CadastroCardapio> {
   Future<void> _atualizaRegistro(int id) async {
     await DatabaseHelper.atualizaCardapio(
       id,
-      id_usuario,
+      id_usuario!,
       cafe1,
       cafe2,
       cafe3,
@@ -333,9 +345,9 @@ class CadastroCardapioState extends State<CadastroCardapio> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-        for (int id in refeicaoIDs) Text(getNomeAlimento(id), style: TextStyle(fontSize: 16)),
-        SizedBox(height: 20),
+        Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+        for (int id in refeicaoIDs) Text(getNomeAlimento(id), style: const TextStyle(fontSize: 16)),
+        const SizedBox(height: 20),
       ],
     );
   }
@@ -362,15 +374,15 @@ class CadastroCardapioState extends State<CadastroCardapio> {
                 final jantaIDs = dynamicListToIntList([registro['janta1_id'], registro['janta2_id'], registro['janta3_id'], registro['janta4_id']]);
 
                 return Card(
-                  color: Color.fromARGB(255, 237, 250, 211),
+                  color: const Color.fromARGB(255, 237, 250, 211),
                   margin: const EdgeInsets.all(15),
                   child: ListTile(
                     title: Text('Cardápio de ${_usuarios.firstWhere((element) => element['id'] == registro['id_usuario'])['nome']}',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         buildRefeicao('Café', cafeIDs),
                         buildRefeicao('Almoço', almocoIDs),
                         buildRefeicao('Janta', jantaIDs),

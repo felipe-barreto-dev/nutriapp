@@ -275,7 +275,7 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
                       child: leadingWidget,
                     ),
                     title: Text(alimento['nome']),
-                    subtitle: Text(alimento['categoria']),
+                    subtitle: Text(alimento['categoria'] + " - " + alimento['tipo']),
                     trailing: IconButton(
                       icon: const Icon(Icons.more_vert),
                       onPressed: () => _showOptionsModal(alimento['id']), // Abre o modal de opções
