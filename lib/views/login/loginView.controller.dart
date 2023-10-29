@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:nutriapp/main.dart'; 
 
 class LoginController extends GetxController{
-  TextEditingController emailInput = TextEditingController();
-  TextEditingController passwordInput = TextEditingController();
+  TextEditingController emailInput = TextEditingController(text: 'admin@admin.com');
+  TextEditingController passwordInput = TextEditingController(text: 'admin');
   static const email = 'admin@admin.com';
   static const password = 'admin';
 

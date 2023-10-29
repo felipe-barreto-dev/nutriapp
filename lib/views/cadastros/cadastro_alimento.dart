@@ -1,8 +1,9 @@
 import 'dart:io';
 
+import 'package:image_picker/image_picker.dart';
 import 'package:nutriapp/helpers/database_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:nutriapp/util/foto_perfil.dart';
+import 'package:share_plus/share_plus.dart';
 
 const List<String> categorias = <String>['Café', 'Almoço', 'Janta'];
 const List<String> tipos = <String>['Bebida', 'Proteína', 'Carboidrato', 'Fruta', 'Grão'];
@@ -83,6 +84,17 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
       _typeController = registroExistente['tipo'];
     }
 
+    Future<void> _pickImage() async {
+      final imagePicker = ImagePicker();
+      final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+
+      if (pickedFile != null) {
+        setState(() {
+          _photoController.text = pickedFile.path;
+        });
+      }
+    }
+
     showModalBottomSheet(
       context: context,
       elevation: 5,
@@ -98,14 +110,27 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(hintText: 'Nome'),
+            SizedBox(
+              width: 120, // Defina a largura desejada para o Container
+              height: 120, // Defina a altura desejada para o Container
+              child: CircleAvatar(
+                radius: 60, // Ajuste o raio para controlar o tamanho do CircleAvatar
+                backgroundImage: _photoController.text.isNotEmpty
+                    ? FileImage(File(_photoController.text))
+                    : null,
+                child: _photoController.text.isEmpty
+                    ? const Icon(Icons.person, size: 60, color: Colors.white)
+                    : null,
+              ),
+            ),
+            ElevatedButton(
+              onPressed: _pickImage, // Chama a função para selecionar uma imagem
+              child: const Text('Escolher Foto'),
             ),
             const SizedBox(height: 10),
             TextField(
-              controller: _photoController,
-              decoration: const InputDecoration(hintText: 'Foto'),
+              controller: _nameController,
+              decoration: const InputDecoration(hintText: 'Nome'),
             ),
             const SizedBox(height: 20),
             _buildCategoriaSelector(), // Adicione aqui o DropdownButton de Categoria
@@ -162,40 +187,102 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
     ));
     _exibeTodosRegistros();
   }
-      
+  
+    void _compartilhaRegistro(int userId) {
+      final usuario = _registros.firstWhere((element) => element['id'] == userId);
+
+      final userName = usuario['nome'];
+      final birthDate = DateTime.parse(usuario['data_nascimento']);
+
+      final shareText = 'Nome: $userName\nIdade: anos';
+
+      Share.share(shareText, subject: 'Dados do Usuário'); // Compartilha os dados do usuário
+    }
+
+    void _showOptionsModal(int id) {
+      showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.edit),
+                title: const Text('Editar'),
+                onTap: () {
+                  Navigator.pop(context); // Fecha o modal
+                  _showForm(id); // Abre o formulário de edição
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete),
+                title: const Text('Deletar'),
+                onTap: () {
+                  Navigator.pop(context); // Fecha o modal
+                  _removeRegistro(id); // Remove o registro
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.share),
+                title: const Text('Compartilhar'),
+                onTap: () {
+                  Navigator.pop(context); // Fecha o modal
+                  _compartilhaRegistro(id); // Implemente a lógica de compartilhamento
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: _isLoading
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          :  ListView.builder(
+          : ListView.builder(
               itemCount: _registros.length,
-              itemBuilder: (context, index) => Card(
-                color: Color.fromARGB(255, 237, 250, 211),
-                margin: const EdgeInsets.all(15),
-                child: ListTile(
-                    title: Text(_registros[index]['nome']),
-                    subtitle: Text(_registros[index]['categoria']),
-                    trailing: SizedBox(
-                      width: 100,
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit),
-                            onPressed: () => _showForm(_registros[index]['id']),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () =>
-                                _removeRegistro(_registros[index]['id']),
-                          ),
-                        ],
-                      ),
-                    )),
-              ),
+              itemBuilder: (context, index) {
+                final alimento = _registros[index];
+                final String photoPath = alimento['foto'];
+
+                Widget leadingWidget; // Widget que será exibido no lugar da imagem
+
+                if (photoPath.isNotEmpty) {
+                  // Se houver uma imagem, exibe a imagem
+                  leadingWidget = Image.file(
+                    File(photoPath),
+                    width: 72.0,
+                    height: 72.0,
+                    fit: BoxFit.cover,
+                  );
+                } else {
+                  // Se não houver imagem, você pode escolher outro widget, por exemplo, um ícone
+                  leadingWidget = const Icon(Icons.fastfood); // Substitua pelo ícone desejado
+                }
+
+                return Card(
+                  color: const Color.fromARGB(255, 237, 250, 211),
+                  margin: const EdgeInsets.all(15),
+                  child: ListTile(
+                    leading: SizedBox(
+                      width: 72.0,
+                      height: 72.0,
+                      child: leadingWidget,
+                    ),
+                    title: Text(alimento['nome']),
+                    subtitle: Text(alimento['categoria']),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.more_vert),
+                      onPressed: () => _showOptionsModal(alimento['id']), // Abre o modal de opções
+                    ),
+                  ),
+                );
+              },
             ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),

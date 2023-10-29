@@ -1,5 +1,9 @@
+import 'dart:io';
+
+import 'package:image_picker/image_picker.dart';
 import 'package:nutriapp/helpers/database_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 class CadastroUsuario extends StatefulWidget {
   const CadastroUsuario({super.key});
@@ -70,6 +74,17 @@ class CadastroUsuarioState extends State<CadastroUsuario> {
       }
     }
 
+    Future<void> _pickImage() async {
+      final imagePicker = ImagePicker();
+      final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+
+      if (pickedFile != null) {
+        setState(() {
+          _photoController.text = pickedFile.path;
+        });
+      }
+    }
+
     showModalBottomSheet(
         context: context,
         elevation: 5,
@@ -83,42 +98,32 @@ class CadastroUsuarioState extends State<CadastroUsuario> {
                 bottom: MediaQuery.of(context).viewInsets.bottom + 120,
               ),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
+                  SizedBox(
+                    width: 120, // Defina a largura desejada para o Container
+                    height: 120, // Defina a altura desejada para o Container
+                    child: CircleAvatar(
+                      radius: 60, // Ajuste o raio para controlar o tamanho do CircleAvatar
+                      backgroundImage: _photoController.text.isNotEmpty
+                          ? FileImage(File(_photoController.text))
+                          : null,
+                      child: _photoController.text.isEmpty
+                          ? const Icon(Icons.person, size: 60, color: Colors.white)
+                          : null,
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: _pickImage, // Chama a função para selecionar uma imagem
+                    child: const Text('Escolher Foto'),
+                  ),
                   TextField(
                     controller: _nameController,
                     decoration: const InputDecoration(hintText: 'Nome'),
                   ),
                   const SizedBox(
                     height: 10,
-                  ),
-                  // ProfilePicture(
-                  // size: 100.0,
-                  // onPictureSelected: (File image) {
-                  //   // Aqui você pode implementar a lógica para lidar com a imagem selecionada
-                  //   print('Imagem selecionada: ${image.path}');
-                  // }),
-                  // const SizedBox(
-                  //   height: 10,
-                  // ),
-                  // ElevatedButton(
-                  //   onPressed: () => _selectDate(context),
-                  //   child: Text('Selecione uma data'),
-                  // ),
-                  // const SizedBox(
-                  //   height: 10,
-                  // ),
-                  TextField(
-                    controller: _photoController,
-                    decoration: const InputDecoration(hintText: 'Foto'),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  ElevatedButton(
-                    onPressed: () => _selectDate(context), // Add this line
-                    child: Text('Selecione uma data'),
                   ),
                   const SizedBox(
                     height: 10,
@@ -129,7 +134,7 @@ class CadastroUsuarioState extends State<CadastroUsuario> {
                       hintText: 'Data de Nascimento',
                       suffixIcon: IconButton(
                         onPressed: () => _selectDate(context),
-                        icon: Icon(Icons.calendar_today),
+                        icon: const Icon(Icons.calendar_today),
                       ),
                     ),
                   ),
@@ -162,61 +167,123 @@ class CadastroUsuarioState extends State<CadastroUsuario> {
             ));
   }
 
-  // Insere um novo registro
-  Future<void> _insereRegistro() async {
-    await DatabaseHelper.insereUsuario(
-        _nameController.text, _selectedDate, _photoController.text);
-    _exibeTodosRegistros();
-  }
+    // Insere um novo registro
+    Future<void> _insereRegistro() async {
+      await DatabaseHelper.insereUsuario(
+          _nameController.text, _selectedDate, _photoController.text);
+      _exibeTodosRegistros();
+    }
 
-  // Atualiza um registro
-  Future<void> _atualizaRegistro(int id) async {
-    await DatabaseHelper.atualizaUsuario(
-        id, _nameController.text, _selectedDate, _photoController.text);
-    _exibeTodosRegistros();
-  }
+    // Atualiza um registro
+    Future<void> _atualizaRegistro(int id) async {
+      await DatabaseHelper.atualizaUsuario(
+          id, _nameController.text, _selectedDate, _photoController.text);
+      _exibeTodosRegistros();
+    }
 
-  // Remove um registro
-  void _removeRegistro(int id) async {
-    await DatabaseHelper.removeUsuario(id);
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Usuário removido com sucesso!'),
-    ));
-    _exibeTodosRegistros();
+    // Remove um registro
+    void _removeRegistro(int id) async {
+      await DatabaseHelper.removeUsuario(id);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Usuário removido com sucesso!'),
+      ));
+      _exibeTodosRegistros();
+    }
+
+    void _compartilhaRegistro(int userId) {
+      final usuario = _registros.firstWhere((element) => element['id'] == userId);
+
+      final userName = usuario['nome'];
+      final birthDate = DateTime.parse(usuario['data_nascimento']);
+      final age = calculateAge(birthDate);
+
+      final shareText = 'Nome: $userName\nIdade: $age anos';
+
+      Share.share(shareText, subject: 'Dados do Usuário'); // Compartilha os dados do usuário
+    }
+
+    void _showOptionsModal(int id) {
+      showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.edit),
+                title: const Text('Editar'),
+                onTap: () {
+                  Navigator.pop(context); // Fecha o modal
+                  _showForm(id); // Abre o formulário de edição
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete),
+                title: const Text('Deletar'),
+                onTap: () {
+                  Navigator.pop(context); // Fecha o modal
+                  _removeRegistro(id); // Remove o registro
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.share),
+                title: const Text('Compartilhar'),
+                onTap: () {
+                  Navigator.pop(context); // Fecha o modal
+                  _compartilhaRegistro(id); // Implemente a lógica de compartilhamento
+                },
+              )
+            ],
+          );
+        },
+      );
+    }
+
+  int calculateAge(DateTime birthDate) {
+    final currentDate = DateTime.now();
+    final age = currentDate.year - birthDate.year;
+    if (currentDate.month < birthDate.month ||
+        (currentDate.month == birthDate.month &&
+            currentDate.day < birthDate.day)) {
+      return age - 1;
+    }
+    return age;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Cadastro de usuário"),
+      ),
       body: _isLoading
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          :  ListView.builder(
+          : ListView.builder(
               itemCount: _registros.length,
-              itemBuilder: (context, index) => Card(
-                color: Color.fromARGB(255, 237, 250, 211),
-                margin: const EdgeInsets.all(15),
-                child: ListTile(
-                    title: Text(_registros[index]['nome']),
-                    subtitle: Text(_registros[index]['data_nascimento']),
-                    trailing: SizedBox(
-                      width: 100,
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit),
-                            onPressed: () => _showForm(_registros[index]['id']),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () =>
-                                _removeRegistro(_registros[index]['id']),
-                          ),
-                        ],
-                      ),
-                    )),
-              ),
+              itemBuilder: (context, index) {
+                final usuario = _registros[index];
+                final birthDate = DateTime.parse(usuario['data_nascimento']);
+                final age = calculateAge(birthDate);
+
+                return Card(
+                  color: const Color.fromARGB(255, 237, 250, 211),
+                  margin: const EdgeInsets.all(15),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundImage: FileImage(
+                          File(usuario['foto'])), // Use o caminho local da imagem do usuário como perfil
+                    ),
+                    title: Text(usuario['nome']),
+                    subtitle: Text('Idade: $age anos'),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.more_vert),
+                      onPressed: () => _showOptionsModal(usuario['id']), // Abre o modal de opções
+                    ),
+                  ),
+                );
+              },
             ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
