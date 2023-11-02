@@ -1,7 +1,6 @@
-import 'package:nutriapp/model/FormaGeometrica.dart';
 import 'package:flutter/material.dart';
-
-import '../routes/rotas.dart';
+import 'package:nutriapp/main.dart';
+import 'package:nutriapp/views/cadastros/cadastro_usuario.dart';
 
 class Creditos extends StatefulWidget {
   const Creditos({super.key});
@@ -11,65 +10,129 @@ class Creditos extends StatefulWidget {
 }
 
 class CreditosState extends State<Creditos> {
-  void _onItemTapped(int index) {
-    if (index == 0) {
-      Rotas.pop(context);
-    } else if (index == 1) {
-      Rotas.call(context, "/principal")();
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    final FormaGeometrica formaGeometrica =
-        ModalRoute.of(context)!.settings.arguments as FormaGeometrica;
-
-    final area = formaGeometrica.area;
-    final geometria = formaGeometrica.geometria;
 
     return MaterialApp(
-      title: 'Área do $geometria',
+      title: 'Créditos',
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Área do $geometria'),
+          title: const Text('Créditos'),
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+        drawer: Drawer(
+          child: ListView(
             children: <Widget>[
-              Text(
-                'Área do $geometria',
-                style: const TextStyle(
-                    fontSize: 30,
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold),
+              SizedBox(
+                height: 200, // Altura do cabeçalho personalizado
+                child: DrawerHeader(
+                  decoration: const BoxDecoration(
+                    color: Colors.blue, // Cor de fundo do cabeçalho
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Image.asset(
+                        'assets/images/logo-app.png', // Substitua pelo caminho da sua imagem de logotipo
+                      ),
+                      const Text(
+                        "Teste",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               ),
-              Text(
-                '$area',
-                style:
-                    const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+              ListTile(
+                title: const Text('Home'),
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const Home(),
+                  ));
+                },
+              ),
+              ListTile(
+                title: const Text('Cadastro de Usuário'),
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const CadastroUsuario(),
+                  ));
+                },
+              ),
+              ListTile(
+                title: const Text('Créditos'),
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const Creditos(),
+                  ));
+                },
+              ),
+              ListTile(
+                title: const Text('Sair'),
+                onTap: () {
+                  // Implemente o código de saída aqui
+                },
               ),
             ],
           ),
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: Colors.teal,
-          selectedItemColor: Colors.black,
-          currentIndex: 1,
-          selectedFontSize: 20,
-          unselectedFontSize: 20,
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.error, color: Colors.black),
-              label: 'Corrigir',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home, color: Colors.black),
-              label: 'Novo Cálculo',
-            ),
-          ],
-          onTap: _onItemTapped,
-        ),
+        body: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                'Breno Mazzini Costa',
+                style: TextStyle(
+                    fontSize: 30,
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold)
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Felipe Barreto Pereira',
+                style: TextStyle(
+                    fontSize: 30,
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold)
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Gabrielle de Oliveira Bussi',
+                style: TextStyle(
+                    fontSize: 30,
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold)
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Luiz Felipe Barbosa Arruda',
+                style: TextStyle(
+                    fontSize: 30,
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold)
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Millena de Souza Netto',
+                style: TextStyle(
+                    fontSize: 30,
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold)
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Rafael Claro Ramiro',
+                style: TextStyle(
+                    fontSize: 30,
+                    color: Colors.blue,
+                    fontWeight: FontWeight.bold)
+              ),
+            ],
+          ),
+        )
       ),
     );
   }

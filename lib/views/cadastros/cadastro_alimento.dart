@@ -17,7 +17,6 @@ class CadastroAlimento extends StatefulWidget {
 class CadastroAlimentoState extends State<CadastroAlimento> {
   // Retorna todos os registros da tabela
   List<Map<String, dynamic>> _registros = [];
-  late DateTime _selectedDate;
 
   // Aparece enquanto os dados não são carregados
   bool _isLoading = false;
@@ -25,7 +24,6 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
   //Essa função retorna todos os registros da tabela
   void _exibeTodosRegistros() async {
     final data = await DatabaseHelper.exibeTodosAlimentos();
-    print(data);
     setState(() {
       _registros = data;
       _isLoading = false;
@@ -73,8 +71,6 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
     );
   }
 
-  // Esta função será acionada quando o botão for pressionado
-  // Também será acionado quando um item for inserido, atualizado ou removido
   void _showForm(int? id) async {
     if (id != null) {
       final registroExistente = _registros.firstWhere((element) => element['id'] == id);
@@ -266,13 +262,22 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
                 }
 
                 return Card(
-                  color: const Color.fromARGB(255, 237, 250, 211),
-                  margin: const EdgeInsets.all(15),
+                  color: const Color.fromARGB(255, 255, 255, 255),
+                  margin: const EdgeInsets.all(7.5),
+                  shape: RoundedRectangleBorder(
+                    side: const BorderSide(color: Color.fromARGB(255, 158, 209, 197), width: 2.0), // Define a borda verde
+                    borderRadius: BorderRadius.circular(4.0), // Define o raio dos cantos
+                  ),
                   child: ListTile(
+                    tileColor: const Color.fromARGB(255, 255, 255, 255),
                     leading: SizedBox(
-                      width: 72.0,
-                      height: 72.0,
-                      child: leadingWidget,
+                      width: 72.0, // Largura desejada
+                      height: 72.0, // Altura desejada
+                      child: CircleAvatar(
+                        backgroundImage: FileImage(
+                          File(alimento['foto']),
+                        ), // Use o caminho local da imagem do usuário como perfil
+                      ),
                     ),
                     title: Text(alimento['nome']),
                     subtitle: Text(alimento['categoria'] + " - " + alimento['tipo']),

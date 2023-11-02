@@ -269,12 +269,22 @@ class CadastroUsuarioState extends State<CadastroUsuario> {
 
                 return Card(
                   color: const Color.fromARGB(255, 237, 250, 211),
-                  margin: const EdgeInsets.all(15),
+                  margin: const EdgeInsets.all(7.5),
+                  shape: RoundedRectangleBorder(
+                    side: const BorderSide(color: Color.fromARGB(255, 158, 209, 197), width: 2.0), // Define a borda verde
+                    borderRadius: BorderRadius.circular(4.0), // Define o raio dos cantos
+                  ),
                   child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage: FileImage(
-                          File(usuario['foto'])), // Use o caminho local da imagem do usuário como perfil
+                    leading: SizedBox(
+                      width: 72.0, // Largura desejada
+                      height: 72.0, // Altura desejada
+                      child: CircleAvatar(
+                        backgroundImage: FileImage(
+                          File(usuario['foto']),
+                        ), // Use o caminho local da imagem do usuário como perfil
+                      ),
                     ),
+                    tileColor: const Color.fromARGB(255, 255, 255, 255),
                     title: Text(usuario['nome']),
                     subtitle: Text('Idade: $age anos'),
                     trailing: IconButton(

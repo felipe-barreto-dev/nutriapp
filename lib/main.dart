@@ -52,16 +52,18 @@ class HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('NutriPlus'),
+        backgroundColor: const Color.fromARGB(255, 131, 196, 181),
       ),
       body: _telas[_currentIndex], // Exibe a tela correspondente à aba ativa
       drawer: Drawer(
+        backgroundColor: const Color.fromARGB(255, 158, 209, 197),
         child: ListView(
           children: <Widget>[
             SizedBox(
               height: 200, // Altura do cabeçalho personalizado
               child: DrawerHeader(
                 decoration: const BoxDecoration(
-                  color: Colors.blue, // Cor de fundo do cabeçalho
+                  color: Color.fromARGB(255, 255, 255, 255), // Cor de fundo do cabeçalho
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -72,7 +74,11 @@ class HomeState extends State<Home> {
                     Text(
                       nomeUsuario,
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: Color.fromARGB(255, 40, 106, 86),
+                        // verde escuro logo
+                        // color: Color.fromARGB(255, 131, 196, 181),
+                        // verde claro
+                        // color: Color.fromARGB(255, 158, 209, 197),
                         fontSize: 20,
                       ),
                     ),
@@ -88,7 +94,27 @@ class HomeState extends State<Home> {
               ),
             ),
             ListTile(
-              title: const Text('Cadastro de Usuário'),
+              title: const Text(
+                  'Home',     
+                  style: TextStyle(
+                    fontSize: 20, // Altere o tamanho da fonte desejado aqui
+                  ),
+              ),
+              textColor: const Color.fromARGB(255, 255, 255, 255),
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const Home(),
+                ));
+              },
+            ),
+            ListTile(
+              title: const Text(
+                  'Cadastro de Usuário',     
+                  style: TextStyle(
+                    fontSize: 20, // Altere o tamanho da fonte desejado aqui
+                  ),
+              ),
+              textColor: const Color.fromARGB(255, 255, 255, 255),
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => const CadastroUsuario(),
@@ -96,7 +122,13 @@ class HomeState extends State<Home> {
               },
             ),
             ListTile(
-              title: const Text('Créditos'),
+              title: const Text(
+                  'Créditos',     
+                  style: TextStyle(
+                    fontSize: 20, // Altere o tamanho da fonte desejado aqui
+                  ),
+              ),
+              textColor: const Color.fromARGB(255, 255, 255, 255),
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => const Creditos(),
@@ -104,9 +136,17 @@ class HomeState extends State<Home> {
               },
             ),
             ListTile(
-              title: const Text('Sair'),
+            title: const Text(
+                  'Sair',     
+                  style: TextStyle(
+                    fontSize: 20, // Altere o tamanho da fonte desejado aqui
+                  ),
+              ),
+              textColor: const Color.fromARGB(255, 255, 255, 255),
               onTap: () {
-                // Implemente o código de saída aqui
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const LoginView(),
+                ));
               },
             ),
           ],
@@ -114,6 +154,7 @@ class HomeState extends State<Home> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex, // Índice da aba ativa
+        backgroundColor: const Color.fromARGB(255, 131, 196, 181),
         onTap: (index) {
           setState(() {
             _currentIndex = index; // Atualiza a aba ativa ao tocar em um item do BottomNavigationBar
@@ -121,11 +162,12 @@ class HomeState extends State<Home> {
         },
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.fastfood),
+            icon: Icon(Icons.fastfood, color: Color.fromARGB(255, 255, 255, 255)),
             label: 'Alimento',
+            backgroundColor: Color.fromARGB(255, 255, 255, 255),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.restaurant_menu),
+            icon: Icon(Icons.restaurant_menu, color: Color.fromARGB(255, 255, 255, 255)),
             label: 'Cardápio',
           ),
         ],
