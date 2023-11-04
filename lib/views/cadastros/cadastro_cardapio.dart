@@ -1,5 +1,11 @@
-import 'package:flutter/material.dart';
+import 'dart:io';
+
 import 'package:nutriapp/helpers/database_helper.dart';
+import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
+
+const List<String> categorias = <String>['Café', 'Almoço', 'Janta'];
+const List<String> tipos = <String>['Bebida', 'Proteína', 'Carboidrato', 'Fruta', 'Grão'];
 
 class CadastroCardapio extends StatefulWidget {
   const CadastroCardapio({Key? key}) : super(key: key);
@@ -10,32 +16,81 @@ class CadastroCardapio extends StatefulWidget {
 
 class CadastroCardapioState extends State<CadastroCardapio> {
   List<Map<String, dynamic>> _registros = [];
-  List<Map<String, dynamic>> _alimentos = [];
+  List<Map<String, dynamic>> _filteredRegistros = [];
+  List<Map<String, dynamic>> _alimentosCafe = [];
+  List<Map<String, dynamic>> _alimentosAlmoco = [];
+  List<Map<String, dynamic>> _alimentosJanta = [];
   List<Map<String, dynamic>> _usuarios = [];
+
   bool _isLoading = false;
-  int? id_usuario = null;
-  int cafe1 = 0;
-  int cafe2 = 0;
-  int cafe3 = 0;
-  int almoco1 = 0;
-  int almoco2 = 0;
-  int almoco3 = 0;
-  int almoco4 = 0;
-  int almoco5 = 0;
-  int janta1 = 0;
-  int janta2 = 0;
-  int janta3 = 0;
-  int janta4 = 0;
 
-  List<String> categorias = ['Café', 'Almoço', 'Janta'];
+  final TextEditingController _searchController = TextEditingController();
+  final Set<int> selectedCafeDaManha = <int>{};
+  final Set<int> selectedAlmoco = <int>{};
+  final Set<int> selectedJanta = <int>{};
+  final Set<int> selectedUsuario = <int>{};
 
-  int _getInitialValueForCategoria(String categoria) {
-    final alimentosFiltrados = _alimentos.where((alimento) {
-      String categoriaAlimento = alimento['categoria']; // Supondo que a categoria esteja em uma chave chamada 'categoria'
-      return categoriaAlimento == categoria;
-    }).toList();
+  void toggleAlimento(int id, String mealType) {
+    Set<int> selectedSet;
 
-    return alimentosFiltrados.isNotEmpty ? alimentosFiltrados[0]['id'] : 0;
+    if (mealType == 'Café') {
+      selectedSet = selectedCafeDaManha;
+    } else if (mealType == 'Almoço') {
+      selectedSet = selectedAlmoco;
+    } else if (mealType == 'Janta') {
+      selectedSet = selectedJanta;
+    } else {
+      return;
+    }
+
+    if (selectedSet.contains(id)) {
+      selectedSet.remove(id);
+    } else {
+      if (selectedSet.length < 3) {
+        selectedSet.add(id);
+      } else {
+        // Implemente um tratamento para lidar com o caso de seleção de mais de 3 alimentos.
+      }
+    }
+  }
+
+  void toggleUsuario(int id) {
+    if (selectedUsuario.contains(id)) {
+      selectedUsuario.remove(id);
+    } else {
+      if (selectedUsuario.length < 3) {
+        selectedUsuario.add(id);
+      } else {
+        // Implemente um tratamento para lidar com o caso de seleção de mais de 3 alimentos.
+      }
+    }
+  }
+
+  void _exibeTodosRegistros() async {
+    final data = await DatabaseHelper.exibeTodosCardapios();
+    setState(() {
+      _registros = data;
+      _filteredRegistros = data;
+      _isLoading = false;
+    });
+  }
+
+  void _exibeTodosAlimentos() async {
+    final data = await DatabaseHelper.exibeTodosAlimentos();
+    setState(() {
+      _alimentosCafe = data.where((element) => element['categoria'] == 'Café').toList();
+      _alimentosAlmoco = data.where((element) => element['categoria'] == 'Almoço').toList();
+      _alimentosJanta = data.where((element) => element['categoria'] == 'Janta').toList();
+      _isLoading = false;
+    });
+  }
+
+  void _exibeTodosUsuarios() async {
+    final data = await DatabaseHelper.exibeTodosUsuarios();
+    setState(() {
+      _usuarios = data;
+      _isLoading = false;
+    });
   }
 
   @override
@@ -44,370 +99,413 @@ class CadastroCardapioState extends State<CadastroCardapio> {
     _exibeTodosRegistros();
     _exibeTodosAlimentos();
     _exibeTodosUsuarios();
-
-    cafe1 = _getInitialValueForCategoria('Café');
-    cafe2 = _getInitialValueForCategoria('Café');
-    cafe3 = _getInitialValueForCategoria('Café');
-    almoco1 = _getInitialValueForCategoria('Almoço');
-    almoco2 = _getInitialValueForCategoria('Almoço');
-    almoco3 = _getInitialValueForCategoria('Almoço');
-    almoco4 = _getInitialValueForCategoria('Almoço');
-    almoco5 = _getInitialValueForCategoria('Almoço');
-    janta1 = _getInitialValueForCategoria('Janta');
-    janta2 = _getInitialValueForCategoria('Janta');
-    janta3 = _getInitialValueForCategoria('Janta');
-    janta4 = _getInitialValueForCategoria('Janta');
+    _searchController.addListener(_onSearchChanged);
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  Widget _buildCafeSelector(String label, int selectedValue, String categoria, void Function(int?) onChanged) {
-    List<Map<String, dynamic>> alimentosFiltrados = _alimentos.where((alimento) {
-      String categoriaAlimento = alimento['categoria']; // Supondo que a categoria esteja em uma chave chamada 'categoria'
-      return categoriaAlimento == categoria;
-    }).toList();
-
-    alimentosFiltrados.insert(0, {
-      'id': 0,
-      'nome': 'Selecione uma opção',
-    });
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 10),
-        Text(label, style: const TextStyle(fontSize: 16)),
-        DropdownButton<int>(
-          value: selectedValue,
-          items: alimentosFiltrados.map((alimento) {
-            return DropdownMenuItem<int>(
-              value: alimento['id'],
-              child: Text(alimento['nome']),
-            );
-          }).toList(),
-          onChanged: onChanged,
-        ),
-      ],
-    );
-  }
-
-  void _exibeTodosRegistros() async {
-    final data = await DatabaseHelper.exibeTodosCardapios();
+  void _onSearchChanged() {
+    final searchText = _searchController.text.toLowerCase();
     setState(() {
-      _registros = data;
-      _isLoading = false;
-    });
-  }
-
-  void _exibeTodosAlimentos() async {
-    final data = await DatabaseHelper.exibeTodosAlimentos();
-    setState(() {
-      _alimentos = data;
-      _isLoading = false;
-    });
-  }
-
-  void _exibeTodosUsuarios() async {
-    final data = await DatabaseHelper.exibeTodosUsuarios();
-
-    data.insert(0, {
-      'id': 0,
-      'nome': 'Selecione uma opção',
-    });
-
-    setState(() {
-      _usuarios = data;
-      _isLoading = false;
+      _filteredRegistros = _registros
+          .where((registro) => registro['nome'].toLowerCase().contains(searchText))
+          .toList();
     });
   }
 
   void _showForm(int? id) async {
     if (id != null) {
       final registroExistente = _registros.firstWhere((element) => element['id'] == id);
-      id_usuario = registroExistente['id_usuario'];
-      cafe1 = registroExistente['cafe1_id'];
-      cafe2 = registroExistente['cafe2_id'];
-      cafe3 = registroExistente['cafe3_id'];
-      almoco1 = registroExistente['almoco1_id'];
-      almoco2 = registroExistente['almoco2_id'];
-      almoco3 = registroExistente['almoco3_id'];
-      almoco4 = registroExistente['almoco4_id'];
-      almoco5 = registroExistente['almoco5_id'];
-      janta1 = registroExistente['janta1_id'];
-      janta2 = registroExistente['janta2_id']; 
-      janta3 = registroExistente['janta3_id'];
-      janta4 = registroExistente['janta4_id'];
     }
-
     showModalBottomSheet(
       context: context,
+      elevation: 5,
       isScrollControlled: true,
       builder: (_) {
-        return SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.only(
-              top: 15,
-              left: 15,
-              right: 15,
-              bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Usuário', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                DropdownButton<int>(
-                  value: id_usuario ?? 0, // Use 0 como valor inicial se id_usuario for nulo
-                  items: [
-                    const DropdownMenuItem<int>(
-                      value: 0,
-                      child: Text('Selecione um usuário'),
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return SingleChildScrollView(
+              padding: EdgeInsets.only(
+                top: 15,
+                left: 15,
+                right: 15,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 120,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: <Widget>[
+                        const SizedBox(
+                          height: 50,
+                        ),
+                        const Text(
+                          'Selecione o usuário:',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Container(
+                          height: 100,
+                          constraints: const BoxConstraints(maxHeight: 150),
+                          child: ListView.builder(
+                            itemCount: _usuarios.length,
+                            itemBuilder: (context, index) {
+                              final usuario = _usuarios[index];
+                              final isChecked = selectedUsuario.contains(usuario['id']);
+
+                              return ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: FileImage(File(usuario['foto'])),
+                                ),
+                                title: Text(usuario['nome']),
+                                // subtitle: Column(
+                                //   crossAxisAlignment: CrossAxisAlignment.start,
+                                //   children: [
+                                //     Text('Categoria: ${usuario['categoria']}'),
+                                //     Text('Tipo: ${usuario['tipo']}'),
+                                //   ],
+                                // ),
+                                trailing: Checkbox(
+                                  value: isChecked,
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      toggleUsuario(usuario['id']);
+                                    });
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        const Text(
+                          'Selecione os alimentos para o café da manhã:',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Container(
+                          height: 100,
+                          constraints: const BoxConstraints(maxHeight: 150),
+                          child: ListView.builder(
+                            itemCount: _alimentosCafe.length,
+                            itemBuilder: (context, index) {
+                              final alimento = _alimentosCafe[index];
+                              final isChecked = selectedCafeDaManha.contains(alimento['id']);
+
+                              return ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: FileImage(File(alimento['foto'])),
+                                ),
+                                title: Text(alimento['nome']),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Categoria: ${alimento['categoria']}'),
+                                    Text('Tipo: ${alimento['tipo']}'),
+                                  ],
+                                ),
+                                trailing: Checkbox(
+                                  value: isChecked,
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      toggleAlimento(alimento['id'], 'Almoço');
+                                    });
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        const Text(
+                          'Selecione os alimentos para o almoço:',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Container(
+                          height: 100,
+                          constraints: const BoxConstraints(maxHeight: 150),
+                          child: ListView.builder(
+                            itemCount: _alimentosAlmoco.length,
+                            itemBuilder: (context, index) {
+                              final alimento = _alimentosAlmoco[index];
+                              final isChecked = selectedAlmoco.contains(alimento['id']);
+
+                              return ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: FileImage(File(alimento['foto'])),
+                                ),
+                                title: Text(alimento['nome']),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Categoria: ${alimento['categoria']}'),
+                                    Text('Tipo: ${alimento['tipo']}'),
+                                  ],
+                                ),
+                                trailing: Checkbox(
+                                  value: isChecked,
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      toggleAlimento(alimento['id'], 'Café');
+                                    });
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        const Text(
+                          'Selecione os alimentos para a janta:',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Container(
+                          height: 100,
+                          constraints: const BoxConstraints(maxHeight: 150),
+                          child: ListView.builder(
+                            itemCount: _alimentosJanta.length,
+                            itemBuilder: (context, index) {
+                              final alimento = _alimentosJanta[index];
+                              final isChecked = selectedJanta.contains(alimento['id']);
+
+                              return ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: FileImage(File(alimento['foto'])),
+                                ),
+                                title: Text(alimento['nome']),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Categoria: ${alimento['categoria']}'),
+                                    Text('Tipo: ${alimento['tipo']}'),
+                                  ],
+                                ),
+                                trailing: Checkbox(
+                                  value: isChecked,
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      toggleAlimento(alimento['id'], 'Janta');
+                                    });
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 40, 106, 86)),
+                          ),
+                          onPressed: () async {
+                            if (id == null) {
+                              await _insereRegistro();
+                            }
+
+                            if (id != null) {
+                              await _atualizaRegistro(id);
+                            }
+
+                            Navigator.of(context).pop();
+                          },
+                          child: Text(id == null ? 'Novo cardápio' : 'Atualizar'),
+                        )
+                      ],
                     ),
-                    ..._usuarios.map((user) {
-                      return DropdownMenuItem<int>(
-                        value: user['id'],
-                        child: Text(user['nome']),
-                      );
-                    }).toList(),
-                  ],
-                  onChanged: (newValue) {
-                    setState(() {
-                      id_usuario = newValue == 0 ? null : newValue; // Define como nulo se o valor for 0
-                    });
-                  },
-                ),
-                const SizedBox(height: 20),
-                const Text('Café', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                _buildCafeSelector('Café 1', cafe1, 'Café', (newValue) {
-                  setState(() {
-                    cafe1 = newValue!;
-                  });
-                }),
-                _buildCafeSelector('Café 2', cafe2, 'Café', (newValue) {
-                  setState(() {
-                    cafe2 = newValue!;
-                  });
-                }),
-                _buildCafeSelector('Café 3', cafe3, 'Café', (newValue) {
-                  setState(() {
-                    cafe3 = newValue!;
-                  });
-                }),
-                const SizedBox(height: 20),
-                const Text('Almoço', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                _buildCafeSelector('Almoço 1', almoco1, 'Almoço', (newValue) {
-                  setState(() {
-                    almoco1 = newValue!;
-                  });
-                }),
-                _buildCafeSelector('Almoço 2', almoco2, 'Almoço', (newValue) {
-                  setState(() {
-                    almoco2 = newValue!;
-                  });
-                }),
-                _buildCafeSelector('Almoço 3', almoco3, 'Almoço', (newValue) {
-                  setState(() {
-                    almoco3 = newValue!;
-                  });
-                }),
-                _buildCafeSelector('Almoço 4', almoco4, 'Almoço', (newValue) {
-                  setState(() {
-                    almoco4 = newValue!;
-                  });
-                }),
-                _buildCafeSelector('Almoço 5', almoco5, 'Almoço', (newValue) {
-                  setState(() {
-                    almoco5 = newValue!;
-                  });
-                }),
-                const SizedBox(height: 20),
-                const Text('Janta', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                _buildCafeSelector('Janta 1', janta1, 'Janta', (newValue) {
-                  setState(() {
-                    janta1 = newValue!;
-                  });
-                }),
-                _buildCafeSelector('Janta 2', janta2, 'Janta', (newValue) {
-                  setState(() {
-                    janta2 = newValue!;
-                  });
-                }),
-                _buildCafeSelector('Janta 3', janta3, 'Janta', (newValue) {
-                  setState(() {
-                    janta3 = newValue!;
-                  });
-                }),
-                _buildCafeSelector('Janta 4', janta4, 'Janta', (newValue) {
-                  setState(() {
-                    janta4 = newValue!;
-                  });
-                }),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (id == null) {
-                      await _insereRegistro();
-                    }
-
-                    if (id != null) {
-                      await _atualizaRegistro(id);
-                    }
-
-                    cafe1 = 0;
-                    cafe2 = 0;
-                    cafe3 = 0;
-                    almoco1 = 0;
-                    almoco2 = 0;
-                    almoco3 = 0;
-                    almoco4 = 0;
-                    almoco5 = 0;
-                    janta1 = 0;
-                    janta2 = 0;
-                    janta3 = 0;
-                    janta4 = 0;
-
-                    Navigator.of(context).pop();
-                  },
-                  child: Text(id == null ? 'Novo alimento' : 'Atualizar'),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Voltar'),
-                ),
-              ],
-            ),
-          ),
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
     );
   }
 
   Future<void> _insereRegistro() async {
-    await DatabaseHelper.insereCardapio(
-      id_usuario!,
-      cafe1,
-      cafe2,
-      cafe3,
-      almoco1,
-      almoco2,
-      almoco3,
-      almoco4,
-      almoco5,
-      janta1,
-      janta2,
-      janta3,
-      janta4,
-    );
+    print('Café da Manhã: $selectedCafeDaManha');
+    print('Almoço: $selectedAlmoco');
+    print('Janta: $selectedJanta');
+    // Insira os alimentos selecionados no banco de dados como parte do novo cardápio.
+    // await DatabaseHelper.insereCardapio(selectedCafeDaManha, selectedAlmoco, selectedJanta);
     _exibeTodosRegistros();
   }
 
   Future<void> _atualizaRegistro(int id) async {
-    await DatabaseHelper.atualizaCardapio(
-      id,
-      id_usuario!,
-      cafe1,
-      cafe2,
-      cafe3,
-      almoco1,
-      almoco2,
-      almoco3,
-      almoco4,
-      almoco5,
-      janta1,
-      janta2,
-      janta3,
-      janta4,
-    );
+    print('Café da Manhã: $selectedCafeDaManhaã');
+    print('Almoço: $selectedAlmoco');
+    print('Janta: $selectedJanta');
+    // Atualize o cardápio existente com os novos alimentos selecionados.
+    // await DatabaseHelper.atualizaCardapio(id, selectedCafeDaManhã, selectedAlmoco, selectedJanta);
     _exibeTodosRegistros();
   }
 
   void _removeRegistro(int id) async {
     await DatabaseHelper.removeCardapio(id);
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Cardápio removido com sucesso!'),
+      content: Text('Cardapio removido com sucesso!'),
     ));
     _exibeTodosRegistros();
   }
+  
+  void _compartilhaRegistro(int userId) {
+    final usuario = _registros.firstWhere((element) => element['id'] == userId);
+    final userName = usuario['nome'];
 
-  // Função para obter o nome do alimento com base no ID
-  String getNomeAlimento(int id) {
-    final alimento = _alimentos.firstWhere((element) => element['id'] == id, orElse: () => <String, dynamic>{});
-    return alimento['nome'] ?? 'Alimento não encontrado';
+    final shareText = 'Nome: $userName\nIdade: anos';
+
+    Share.share(shareText, subject: 'Dados do Usuário');
   }
 
-  // Função para criar uma seção de refeição
-  Widget buildRefeicao(String title, List<int> refeicaoIDs) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-        for (int id in refeicaoIDs) Text(getNomeAlimento(id), style: const TextStyle(fontSize: 16)),
-        const SizedBox(height: 20),
-      ],
+  void _showOptionsModal(int id) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.edit),
+              title: const Text('Editar'),
+              onTap: () {
+                Navigator.pop(context);
+                _showForm(id);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete),
+              title: const Text('Deletar'),
+              onTap: () {
+                Navigator.pop(context);
+                _removeRegistro(id);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.share),
+              title: const Text('Compartilhar'),
+              onTap: () {
+                Navigator.pop(context);
+                _compartilhaRegistro(id);
+              },
+            ),
+          ],
+        );
+      },
     );
-  }
-
-  List<int> dynamicListToIntList(List<dynamic> dynamicList) {
-    return dynamicList.cast<int>();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
       body: _isLoading
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : ListView.builder(
-              itemCount: _registros.length,
-              itemBuilder: (context, index) {
-                final registro = _registros[index];
-
-                final cafeIDs = dynamicListToIntList([registro['cafe1_id'], registro['cafe2_id'], registro['cafe3_id']]);
-                final almocoIDs = dynamicListToIntList([registro['almoco1_id'], registro['almoco2_id'], registro['almoco3_id'], registro['almoco4_id'], registro['almoco5_id']]);
-                final jantaIDs = dynamicListToIntList([registro['janta1_id'], registro['janta2_id'], registro['janta3_id'], registro['janta4_id']]);
-
-                return Card(
-                  color: const Color.fromARGB(255, 237, 250, 211),
-                  margin: const EdgeInsets.all(15),
-                  child: ListTile(
-                    title: Text('Cardápio de ${_usuarios.firstWhere((element) => element['id'] == registro['id_usuario'])['nome']}',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 20),
-                        buildRefeicao('Café', cafeIDs),
-                        buildRefeicao('Almoço', almocoIDs),
-                        buildRefeicao('Janta', jantaIDs),
-                      ],
-                    ),
-                    trailing: SizedBox(
-                      width: 100,
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit),
-                            onPressed: () => _showForm(registro['id']),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () => _removeRegistro(registro['id']),
-                          ),
-                        ],
-                      ),
-                    ),
+          : Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: const InputDecoration(
+                    labelText: 'Buscar cardapios por nome',
+                    prefixIcon: Icon(Icons.search),
                   ),
-                );
-              },
-            ),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _filteredRegistros.length,
+                  itemBuilder: (context, index) {
+                    final cardapio = _filteredRegistros[index];
+                    final String photoPath = cardapio['foto'];
+
+                    return Card(
+                      color: const Color.fromARGB(255, 255, 255, 255),
+                      margin: const EdgeInsets.all(7.5),
+                      shape: RoundedRectangleBorder(
+                        side: const BorderSide(color: Color.fromARGB(255, 158, 209, 197), width: 2.0),
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ListTile(
+                          tileColor: const Color.fromARGB(255, 255, 255, 255),
+                          leading: SizedBox(
+                            width: 72.0,
+                            height: 72.0,
+                            child: CircleAvatar(
+                              backgroundColor: const Color.fromARGB(255, 40, 106, 86),
+                              backgroundImage: photoPath.isNotEmpty
+                                  ? FileImage(File(photoPath))
+                                  : null,
+                              child: !photoPath.isNotEmpty
+                                  ? const Icon(Icons.dinner_dining, size: 30, color: Colors.white)
+                                  : null,
+                            ),
+                          ),
+                          title: Text(cardapio['nome']),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Text('Categoria: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  Text('${cardapio['categoria']}'),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  const Text('Tipo: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  Text('${cardapio['tipo']}'),
+                                ],
+                              ),
+                            ],
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.more_vert),
+                            onPressed: () => _showOptionsModal(cardapio['id']),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color.fromARGB(255, 40, 106, 86),
         child: const Icon(Icons.add),
         onPressed: () => _showForm(null),
       ),
