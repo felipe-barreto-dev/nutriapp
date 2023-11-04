@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nutriapp/views/cadastros/cadastro_usuario.dart';
 import 'package:nutriapp/views/creditos.dart';
-import 'package:nutriapp/views/login/login.view.dart';
+import 'package:nutriapp/views/login/login.dart';
 
 import '../main.dart';
 
@@ -10,7 +10,7 @@ class Rotas {
     return {
       '/cadastro-usuario': (context) => const CadastroUsuario(),
       '/creditos': (context) => const Creditos(),
-      '/login': (context) => const LoginView(),
+      '/login': (context) => const Login(),
       '/principal': (context) => const Home()
     };
   }

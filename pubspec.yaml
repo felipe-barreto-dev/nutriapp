@@ -38,6 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   get: ^4.6.6
   share_plus: ^7.2.1
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:
@@ -62,12 +63,9 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/formula-area-do-retangulo.png
-    - assets/images/triangulo.png
-    - assets/images/area-circulo.png
-    - assets/images/area-quadrado.png
-    - assets/images/trapezio.png
     - assets/images/logo-app.png
+    - assets/images/logo+name.png
+    - assets/images/only-logo.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

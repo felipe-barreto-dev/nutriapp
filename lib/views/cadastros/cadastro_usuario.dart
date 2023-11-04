@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:nutriapp/helpers/database_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:nutriapp/util/custom_drawer.dart';
 import 'package:share_plus/share_plus.dart';
 
 class CadastroUsuario extends StatefulWidget {
@@ -15,6 +16,9 @@ class CadastroUsuario extends StatefulWidget {
 class CadastroUsuarioState extends State<CadastroUsuario> {
   // Retorna todos os registros da tabela
   List<Map<String, dynamic>> _registros = [];
+  List<Map<String, dynamic>> _filteredRegistros = []; // Lista filtrada
+
+  final TextEditingController _searchController = TextEditingController(); // Controlador do campo de busca
 
   // Aparece enquanto os dados não são carregados
   bool _isLoading = true;
@@ -24,6 +28,7 @@ class CadastroUsuarioState extends State<CadastroUsuario> {
     final data = await DatabaseHelper.exibeTodosUsuarios();
     setState(() {
       _registros = data;
+      _filteredRegistros = data;
       _isLoading = false;
     });
   }
@@ -33,6 +38,17 @@ class CadastroUsuarioState extends State<CadastroUsuario> {
     super.initState();
     _selectedDate = DateTime.now();
     _exibeTodosRegistros();
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  void _onSearchChanged() {
+    // Filtra a lista de registros com base no texto digitado no campo de busca
+    final searchText = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredRegistros = _registros
+          .where((registro) => registro['nome'].toLowerCase().contains(searchText))
+          .toList();
+    });
   }
 
   final TextEditingController _nameController = TextEditingController();
@@ -94,7 +110,6 @@ class CadastroUsuarioState extends State<CadastroUsuario> {
                 top: 15,
                 left: 15,
                 right: 15,
-                // Isso impedirá que o teclado programável cubra os campos de texto
                 bottom: MediaQuery.of(context).viewInsets.bottom + 120,
               ),
               child: Column(
@@ -115,12 +130,13 @@ class CadastroUsuarioState extends State<CadastroUsuario> {
                     ),
                   ),
                   ElevatedButton(
-                    onPressed: _pickImage, // Chama a função para selecionar uma imagem
-                    child: const Text('Escolher Foto'),
+                    onPressed: _pickImage,
+                    style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color.fromARGB(255, 40, 106, 86))), // Chama a função para selecionar uma imagem
+                    child: const Text('Escolher Foto')
                   ),
                   TextField(
                     controller: _nameController,
-                    decoration: const InputDecoration(hintText: 'Nome'),
+                    decoration: const InputDecoration(labelText: 'Nome'),
                   ),
                   const SizedBox(
                     height: 10,
@@ -142,6 +158,7 @@ class CadastroUsuarioState extends State<CadastroUsuario> {
                     height: 20,
                   ),
                   ElevatedButton(
+                    style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color.fromARGB(255, 40, 106, 86))),
                     onPressed: () async {
                       // Salva o registro
                       if (id == null) {
@@ -253,49 +270,75 @@ class CadastroUsuarioState extends State<CadastroUsuario> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const CustomDrawer(currentIndex: 1),
       appBar: AppBar(
         title: const Text("Cadastro de usuário"),
+        backgroundColor: const Color.fromARGB(255, 131, 196, 181),
       ),
       body: _isLoading
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : ListView.builder(
-              itemCount: _registros.length,
-              itemBuilder: (context, index) {
-                final usuario = _registros[index];
-                final birthDate = DateTime.parse(usuario['data_nascimento']);
-                final age = calculateAge(birthDate);
-
-                return Card(
-                  color: const Color.fromARGB(255, 237, 250, 211),
-                  margin: const EdgeInsets.all(7.5),
-                  shape: RoundedRectangleBorder(
-                    side: const BorderSide(color: Color.fromARGB(255, 158, 209, 197), width: 2.0), // Define a borda verde
-                    borderRadius: BorderRadius.circular(4.0), // Define o raio dos cantos
+          : Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: const InputDecoration(
+                    labelText: 'Buscar usuários por nome',
+                    prefixIcon: Icon(Icons.search),
                   ),
-                  child: ListTile(
-                    leading: SizedBox(
-                      width: 72.0, // Largura desejada
-                      height: 72.0, // Altura desejada
-                      child: CircleAvatar(
-                        backgroundImage: FileImage(
-                          File(usuario['foto']),
-                        ), // Use o caminho local da imagem do usuário como perfil
-                      ),
-                    ),
-                    tileColor: const Color.fromARGB(255, 255, 255, 255),
-                    title: Text(usuario['nome']),
-                    subtitle: Text('Idade: $age anos'),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.more_vert),
-                      onPressed: () => _showOptionsModal(usuario['id']), // Abre o modal de opções
-                    ),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                    itemCount: _filteredRegistros.length,
+                    itemBuilder: (context, index) {
+                      final usuario = _filteredRegistros[index];
+                      final birthDate = DateTime.parse(usuario['data_nascimento']);
+                      final age = calculateAge(birthDate);
+              
+                      return Card(
+                        color: const Color.fromARGB(255, 237, 250, 211),
+                        margin: const EdgeInsets.all(7.5),
+                        shape: RoundedRectangleBorder(
+                          side: const BorderSide(color: Color.fromARGB(255, 158, 209, 197), width: 2.0), // Define a borda verde
+                          borderRadius: BorderRadius.circular(4.0), // Define o raio dos cantos
+                        ),
+                        child: ListTile(
+                          leading: SizedBox(
+                            width: 72.0, // Largura desejada
+                            height: 72.0, // Altura desejada
+                            child: SizedBox(
+                              child: CircleAvatar(
+                                  backgroundColor: const Color.fromARGB(255, 40, 106, 86),
+                                  radius: 60, // Ajuste o raio para controlar o tamanho do CircleAvatar
+                                  backgroundImage: usuario['foto'].isNotEmpty
+                                      ? FileImage(File(usuario['foto']))
+                                      : null,
+                                  child: usuario['foto'].isEmpty
+                                      ? const Icon(Icons.person, size: 40, color: Colors.white)
+                                      : null,
+                                )
+                              ),
+                            ),
+                          tileColor: const Color.fromARGB(255, 255, 255, 255),
+                          title: Text(usuario['nome']),
+                          subtitle: Text('Idade: $age anos'),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.more_vert),
+                            onPressed: () => _showOptionsModal(usuario['id']), // Abre o modal de opções
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
+              ),
+            ],
+          ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color.fromARGB(255, 40, 106, 86),
         child: const Icon(Icons.add),
         onPressed: () => _showForm(null),
       ),

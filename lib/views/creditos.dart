@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nutriapp/main.dart';
+import 'package:nutriapp/util/custom_drawer.dart';
 import 'package:nutriapp/views/cadastros/cadastro_usuario.dart';
 
 class Creditos extends StatefulWidget {
@@ -17,67 +18,10 @@ class CreditosState extends State<Creditos> {
     return MaterialApp(
       title: 'Créditos',
       home: Scaffold(
+        drawer: const CustomDrawer(currentIndex: 1),
         appBar: AppBar(
-          title: const Text('Créditos'),
-        ),
-        drawer: Drawer(
-          child: ListView(
-            children: <Widget>[
-              SizedBox(
-                height: 200, // Altura do cabeçalho personalizado
-                child: DrawerHeader(
-                  decoration: const BoxDecoration(
-                    color: Colors.blue, // Cor de fundo do cabeçalho
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Image.asset(
-                        'assets/images/logo-app.png', // Substitua pelo caminho da sua imagem de logotipo
-                      ),
-                      const Text(
-                        "Teste",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              ListTile(
-                title: const Text('Home'),
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const Home(),
-                  ));
-                },
-              ),
-              ListTile(
-                title: const Text('Cadastro de Usuário'),
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const CadastroUsuario(),
-                  ));
-                },
-              ),
-              ListTile(
-                title: const Text('Créditos'),
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const Creditos(),
-                  ));
-                },
-              ),
-              ListTile(
-                title: const Text('Sair'),
-                onTap: () {
-                  // Implemente o código de saída aqui
-                },
-              ),
-            ],
-          ),
+          title: const Text("Créditos"),
+          backgroundColor: const Color.fromARGB(255, 131, 196, 181),
         ),
         body: const Center(
           child: Column(
