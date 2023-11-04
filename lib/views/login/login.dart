@@ -96,7 +96,7 @@ class LoginState extends State<Login> {
               itemBuilder: (context, index) {
                 final usuario = _registros[index];
                 return Padding(
-                  padding: const EdgeInsets.all(15),
+                  padding: const EdgeInsets.all(7),
                   child: GestureDetector(
                     onTap: () {
                       _saveSelectedUser(usuario);
