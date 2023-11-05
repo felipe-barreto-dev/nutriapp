@@ -23,14 +23,12 @@ class LoginState extends State<Login> {
 
   late DateTime _selectedDate;
 
-  // Insere um novo registro
   Future<void> _insereRegistro() async {
     await DatabaseHelper.insereUsuario(
         _nameController.text, _selectedDate, _photoController.text);
     _exibeTodosRegistros();
   }
 
-  // Atualiza um registro
   Future<void> _atualizaRegistro(int id) async {
     await DatabaseHelper.atualizaUsuario(
         id, _nameController.text, _selectedDate, _photoController.text);
@@ -65,6 +63,7 @@ class LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
+    _selectedDate = DateTime.now();
     _exibeTodosRegistros();
   }
 
@@ -87,13 +86,9 @@ class LoginState extends State<Login> {
                   width: 50.0,
                   height: 50.0,
                   child: CircleAvatar(
-                    radius: 40,
-                    backgroundImage: usuario['foto'].isNotEmpty
-                        ? FileImage(File(usuario['foto']))
-                        : null,
-                    child: usuario['foto'].isEmpty
-                        ? const Icon(Icons.person, size: 30, color: Colors.white)
-                        : null,
+                    backgroundImage: FileImage(
+                      File(usuario['foto']),
+                    ),
                   ),
                 ),
                 title: Text(usuario['nome']),
@@ -117,17 +112,19 @@ class LoginState extends State<Login> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    final DateTime now = DateTime.now();
+    final DateTime initialDate = DateTime(1900);
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
+      initialDate:
+          _selectedDate.isBefore(initialDate) ? initialDate : _selectedDate,
+      firstDate: initialDate,
+      lastDate: now,
     );
     if (picked != null) {
       setState(() {
         _selectedDate = picked;
-        _birthdayDateController.text =
-            "${picked.toLocal()}".split(' ')[0];
+        _birthdayDateController.text = "${picked.toLocal()}".split(' ')[0];
       });
     }
   }
@@ -135,30 +132,61 @@ class LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> _telas = [
-      SingleChildScrollView(
-        child: Column(
-          children: [
-            Image.asset(
-              'assets/images/logo+name.png', // Substitua pelo caminho da sua imagem de logotipo
-            ),
-            const Divider(
-              thickness: 1,
-              color: Color.fromARGB(255, 255, 255, 255),
-            ),
-            const Text(
-              'Selecione ou crie um usuário abaixo:',
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 20,
-                color: Color.fromARGB(255, 40, 106, 86),
+      WillPopScope(
+        onWillPop: () async {
+          if (_currentIndex == 1) {
+            // Se estiver na tela de cadastro, retorne para a tela de login
+            setState(() {
+              _currentIndex = 0;
+            });
+            return false;
+          } else {
+            // Se estiver na tela de login, exiba o diálogo de confirmação para sair do aplicativo
+            return (await showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text('Sair do aplicativo?'),
+                    content:
+                        Text('Você tem certeza que deseja sair do aplicativo?'),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: Text('Cancelar'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        child: Text('Sair'),
+                      ),
+                    ],
+                  ),
+                )) ??
+                false;
+          }
+        },
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Image.asset(
+                'assets/images/logo+name.png',
               ),
-            ),
-            if (_isLoading) // Show a loading indicator
-              CircularProgressIndicator(),
-            if (!_isLoading && _registros.isEmpty) // Show a message if no records are found
-              Text("Nenhum usuário cadastrado"),
-            if (!_isLoading && _registros.isNotEmpty) _buildUserList(),
-          ],
+              const Divider(
+                thickness: 1,
+                color: Color.fromARGB(255, 255, 255, 255),
+              ),
+              const Text(
+                'Selecione ou crie um usuário abaixo:',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 20,
+                  color: Color.fromARGB(255, 40, 106, 86),
+                ),
+              ),
+              if (_isLoading) CircularProgressIndicator(),
+              if (!_isLoading && _registros.isEmpty)
+                Text("Nenhum usuário cadastrado"),
+              if (!_isLoading && _registros.isNotEmpty) _buildUserList(),
+            ],
+          ),
         ),
       ),
       Padding(
@@ -168,8 +196,8 @@ class LoginState extends State<Login> {
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
-              width: 120, // Defina a largura desejada para o Container
-              height: 120, // Defina a altura desejada para o Container
+              width: 120,
+              height: 120,
               child: CircleAvatar(
                 radius: 60,
                 backgroundImage: _photoController.text.isNotEmpty
@@ -181,10 +209,11 @@ class LoginState extends State<Login> {
               ),
             ),
             ElevatedButton(
-              onPressed: _pickImage,
-              style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color.fromARGB(255, 40, 106, 86))), // Chama a função para selecionar uma imagem
-              child: const Text('Escolher Foto')
-            ),
+                onPressed: _pickImage,
+                style: const ButtonStyle(
+                    backgroundColor: MaterialStatePropertyAll(
+                        Color.fromARGB(255, 40, 106, 86))),
+                child: const Text('Escolher Foto')),
             TextField(
               controller: _nameController,
               decoration: const InputDecoration(labelText: 'Nome'),
@@ -197,6 +226,7 @@ class LoginState extends State<Login> {
             ),
             TextFormField(
               controller: _birthdayDateController,
+              readOnly: true,
               decoration: InputDecoration(
                 hintText: 'Data de Nascimento',
                 suffixIcon: IconButton(
@@ -209,9 +239,10 @@ class LoginState extends State<Login> {
               height: 20,
             ),
             ElevatedButton(
-              style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color.fromARGB(255, 40, 106, 86))),
+              style: const ButtonStyle(
+                  backgroundColor: MaterialStatePropertyAll(
+                      Color.fromARGB(255, 40, 106, 86))),
               onPressed: () async {
-                // Salva o registro
                 await _insereRegistro();
 
                 // Limpa os campos
@@ -219,13 +250,15 @@ class LoginState extends State<Login> {
                 _birthdayDateController.text = '';
                 _photoController.text = '';
 
-                // Fecha o modal de inserção/alteração
-                Navigator.of(context).pop();
+                // Atualiza o índice para 0 (tela de login)
+                setState(() {
+                  _currentIndex = 0;
+                });
               },
               child: Text('Novo usuário'),
             )
           ],
-      ),
+        ),
       ),
     ];
 
@@ -246,13 +279,13 @@ class LoginState extends State<Login> {
         elevation: 4,
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex, // Índice da aba ativa
+        currentIndex: _currentIndex,
         backgroundColor: const Color.fromARGB(255, 131, 196, 181),
-        unselectedItemColor: const Color.fromARGB(255, 40, 106, 86), // Set unselected items to white
-        selectedItemColor: Colors.white, // Set selected items to dark green
+        unselectedItemColor: const Color.fromARGB(255, 40, 106, 86),
+        selectedItemColor: Colors.white,
         onTap: (index) {
           setState(() {
-            _currentIndex = index; // Atualiza a aba ativa ao tocar em um item do BottomNavigationBar
+            _currentIndex = index;
           });
         },
         items: const [
