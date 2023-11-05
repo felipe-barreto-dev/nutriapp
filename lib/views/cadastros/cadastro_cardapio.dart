@@ -69,11 +69,8 @@ class CadastroCardapioState extends State<CadastroCardapio> {
     if (selectedUsuario.contains(id)) {
       selectedUsuario.remove(id);
     } else {
-      if (selectedUsuario.length < 2) {
-        selectedUsuario.add(id);
-      } else {
-        // Implemente um tratamento para lidar com o caso de seleção de mais de 3 alimentos.
-      }
+      selectedUsuario.remove(selectedUsuario);
+      selectedUsuario.add(id);
     }
   }
 
