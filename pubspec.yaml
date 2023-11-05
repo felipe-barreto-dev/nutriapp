@@ -28,6 +28,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  flutter_native_splash: ^2.3.5 
   flutter:
     sdk: flutter
 
@@ -43,6 +44,16 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.13.1
+
+flutter_native_splash:
+  color: "#83c4b5"
+  image: assets\images\logo+name.png
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  image_path: "assets/images/only-logo.png"
+  min_sdk_android: 21
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
