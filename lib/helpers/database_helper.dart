@@ -61,29 +61,35 @@ class DatabaseHelper {
     );
   }
 
-  static Future<int> insereUsuario(String nome, DateTime dataNascimento, String foto) async {
+  static Future<int> insereUsuario(
+      String nome, DateTime dataNascimento, String foto) async {
     final database = await DatabaseHelper.database();
 
     final data = {
       'nome': nome,
-      'data_nascimento': dataNascimento.toIso8601String(), // Convert DateTime to ISO 8601 format
+      'data_nascimento': dataNascimento
+          .toIso8601String(), // Convert DateTime to ISO 8601 format
       'foto': foto,
     };
 
-    final id = await database.insert('usuario', data, conflictAlgorithm: sql.ConflictAlgorithm.replace);
+    final id = await database.insert('usuario', data,
+        conflictAlgorithm: sql.ConflictAlgorithm.replace);
     return id;
   }
 
-  static Future<int> atualizaUsuario(int id, String nome, DateTime dataNascimento, String foto) async {
+  static Future<int> atualizaUsuario(
+      int id, String nome, DateTime dataNascimento, String foto) async {
     final database = await DatabaseHelper.database();
 
     final data = {
       'nome': nome,
-      'data_nascimento': dataNascimento.toIso8601String(), // Convert DateTime to ISO 8601 format
+      'data_nascimento': dataNascimento
+          .toIso8601String(), // Convert DateTime to ISO 8601 format
       'foto': foto,
     };
 
-    final result = await database.update('usuario', data, where: "id = ?", whereArgs: [id]);
+    final result = await database
+        .update('usuario', data, where: "id = ?", whereArgs: [id]);
     return result;
   }
 
@@ -94,7 +100,8 @@ class DatabaseHelper {
 
   static Future<Map<String, dynamic>?> retornaUsuario(int id) async {
     final database = await DatabaseHelper.database();
-    final results = await database.query('usuario', where: "id = ?", whereArgs: [id], limit: 1);
+    final results = await database.query('usuario',
+        where: "id = ?", whereArgs: [id], limit: 1);
     if (results.isNotEmpty) {
       return results.first;
     }
@@ -110,7 +117,8 @@ class DatabaseHelper {
     }
   }
 
-  static Future<int> insereAlimento(String nome, String foto, String categoria, String tipo) async {
+  static Future<int> insereAlimento(
+      String nome, String foto, String categoria, String tipo) async {
     final database = await DatabaseHelper.database();
 
     final data = {
@@ -120,7 +128,8 @@ class DatabaseHelper {
       'tipo': tipo,
     };
 
-    final id = await database.insert('alimentos', data, conflictAlgorithm: sql.ConflictAlgorithm.replace);
+    final id = await database.insert('alimentos', data,
+        conflictAlgorithm: sql.ConflictAlgorithm.replace);
     return id;
   }
 
@@ -131,14 +140,16 @@ class DatabaseHelper {
 
   static Future<Map<String, dynamic>?> retornaAlimento(int id) async {
     final database = await DatabaseHelper.database();
-    final results = await database.query('alimentos', where: "id = ?", whereArgs: [id], limit: 1);
+    final results = await database.query('alimentos',
+        where: "id = ?", whereArgs: [id], limit: 1);
     if (results.isNotEmpty) {
       return results.first;
     }
     return null;
   }
 
-  static Future<int> atualizaAlimento(int id, String nome, String foto, String categoria, String tipo) async {
+  static Future<int> atualizaAlimento(
+      int id, String nome, String foto, String categoria, String tipo) async {
     final database = await DatabaseHelper.database();
 
     final data = {
@@ -148,7 +159,8 @@ class DatabaseHelper {
       'tipo': tipo,
     };
 
-    final result = await database.update('alimentos', data, where: "id = ?", whereArgs: [id]);
+    final result = await database
+        .update('alimentos', data, where: "id = ?", whereArgs: [id]);
     return result;
   }
 
@@ -162,20 +174,20 @@ class DatabaseHelper {
   }
 
   static Future<int> insereCardapio(
-      int idUsuario,
-      int cafe1Id,
-      int cafe2Id,
-      int cafe3Id,
-      int almoco1Id,
-      int almoco2Id,
-      int almoco3Id,
-      int almoco4Id,
-      int almoco5Id,
-      int janta1Id,
-      int janta2Id,
-      int janta3Id,
-      int janta4Id,
-    ) async {
+    int idUsuario,
+    int cafe1Id,
+    int cafe2Id,
+    int cafe3Id,
+    int almoco1Id,
+    int almoco2Id,
+    int almoco3Id,
+    int almoco4Id,
+    int almoco5Id,
+    int janta1Id,
+    int janta2Id,
+    int janta3Id,
+    int janta4Id,
+  ) async {
     final database = await DatabaseHelper.database();
 
     final data = {
@@ -194,11 +206,12 @@ class DatabaseHelper {
       'janta4_id': janta4Id,
     };
 
-    final id = await database.insert('cardapio', data, conflictAlgorithm: sql.ConflictAlgorithm.replace);
+    final id = await database.insert('cardapio', data,
+        conflictAlgorithm: sql.ConflictAlgorithm.replace);
     return id;
   }
 
-    // Atualiza um registro de cardápio
+  // Atualiza um registro de cardápio
   static Future<int> atualizaCardapio(
     int id,
     int idUsuario,
@@ -233,7 +246,8 @@ class DatabaseHelper {
       'janta4_id': janta4Id,
     };
 
-    final result = await database.update('cardapio', data, where: "id = ?", whereArgs: [id]);
+    final result = await database
+        .update('cardapio', data, where: "id = ?", whereArgs: [id]);
     return result;
   }
 
@@ -246,7 +260,8 @@ class DatabaseHelper {
   // Obtém as informações do cardápio
   static Future<Map<String, dynamic>?> retornaCardapio(int idCardapio) async {
     final database = await DatabaseHelper.database();
-    final results = await database.query('cardapio', where: "id = ?", whereArgs: [idCardapio], limit: 1);
+    final results = await database.query('cardapio',
+        where: "id = ?", whereArgs: [idCardapio], limit: 1);
     if (results.isNotEmpty) {
       return results.first;
     }

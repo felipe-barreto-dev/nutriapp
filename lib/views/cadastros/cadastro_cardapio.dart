@@ -61,8 +61,6 @@ class CadastroCardapioState extends State<CadastroCardapio> {
     } else {
       return;
     }
-
-
   }
 
   void toggleUsuario(int id) {
@@ -86,9 +84,12 @@ class CadastroCardapioState extends State<CadastroCardapio> {
   void _exibeTodosAlimentos() async {
     final data = await DatabaseHelper.exibeTodosAlimentos();
     setState(() {
-      _alimentosCafe = data.where((element) => element['categoria'] == 'Café').toList();
-      _alimentosAlmoco = data.where((element) => element['categoria'] == 'Almoço').toList();
-      _alimentosJanta = data.where((element) => element['categoria'] == 'Janta').toList();
+      _alimentosCafe =
+          data.where((element) => element['categoria'] == 'Café').toList();
+      _alimentosAlmoco =
+          data.where((element) => element['categoria'] == 'Almoço').toList();
+      _alimentosJanta =
+          data.where((element) => element['categoria'] == 'Janta').toList();
       _isLoading = false;
     });
   }
@@ -114,14 +115,19 @@ class CadastroCardapioState extends State<CadastroCardapio> {
     final searchText = _searchController.text.toLowerCase();
     setState(() {
       _filteredRegistros = _registros
-          .where((registro) => _usuarios.firstWhere((element) => registro['id_usuario'] == element['id'])['nome'].toLowerCase().contains(searchText))
+          .where((registro) => _usuarios
+              .firstWhere(
+                  (element) => registro['id_usuario'] == element['id'])['nome']
+              .toLowerCase()
+              .contains(searchText))
           .toList();
     });
   }
 
   void _showForm(int? id) async {
     if (id != null) {
-      final registroExistente = _registros.firstWhere((element) => element['id'] == id);
+      final registroExistente =
+          _registros.firstWhere((element) => element['id'] == id);
 
       selectedUsuario.add(registroExistente['id_usuario']);
 
@@ -139,7 +145,6 @@ class CadastroCardapioState extends State<CadastroCardapio> {
       selectedJanta.add(registroExistente['janta2_id']);
       selectedJanta.add(registroExistente['janta3_id']);
       selectedJanta.add(registroExistente['janta4_id']);
-
     }
     showModalBottomSheet(
       context: context,
@@ -182,7 +187,8 @@ class CadastroCardapioState extends State<CadastroCardapio> {
                             itemCount: _usuarios.length,
                             itemBuilder: (context, index) {
                               final usuario = _usuarios[index];
-                              final isChecked = selectedUsuario.contains(usuario['id']);
+                              final isChecked =
+                                  selectedUsuario.contains(usuario['id']);
 
                               return ListTile(
                                 leading: CircleAvatar(
@@ -191,7 +197,8 @@ class CadastroCardapioState extends State<CadastroCardapio> {
                                       ? FileImage(File(usuario['foto']))
                                       : null,
                                   child: usuario['foto'].isEmpty
-                                      ? const Icon(Icons.person, size: 30, color: Colors.white)
+                                      ? const Icon(Icons.person,
+                                          size: 30, color: Colors.white)
                                       : null,
                                 ),
                                 title: Text(usuario['nome']),
@@ -227,7 +234,8 @@ class CadastroCardapioState extends State<CadastroCardapio> {
                             itemCount: _alimentosCafe.length,
                             itemBuilder: (context, index) {
                               final alimento = _alimentosCafe[index];
-                              final isChecked = selectedCafeDaManha.contains(alimento['id']);
+                              final isChecked =
+                                  selectedCafeDaManha.contains(alimento['id']);
 
                               return ListTile(
                                 leading: CircleAvatar(
@@ -236,7 +244,8 @@ class CadastroCardapioState extends State<CadastroCardapio> {
                                       ? FileImage(File(alimento['foto']))
                                       : null,
                                   child: alimento['foto'].isEmpty
-                                      ? const Icon(Icons.dinner_dining, size: 30, color: Colors.white)
+                                      ? const Icon(Icons.dinner_dining,
+                                          size: 30, color: Colors.white)
                                       : null,
                                 ),
                                 title: Text(alimento['nome']),
@@ -279,7 +288,8 @@ class CadastroCardapioState extends State<CadastroCardapio> {
                             itemCount: _alimentosAlmoco.length,
                             itemBuilder: (context, index) {
                               final alimento = _alimentosAlmoco[index];
-                              final isChecked = selectedAlmoco.contains(alimento['id']);
+                              final isChecked =
+                                  selectedAlmoco.contains(alimento['id']);
 
                               return ListTile(
                                 leading: CircleAvatar(
@@ -288,7 +298,8 @@ class CadastroCardapioState extends State<CadastroCardapio> {
                                       ? FileImage(File(alimento['foto']))
                                       : null,
                                   child: alimento['foto'].isEmpty
-                                      ? const Icon(Icons.dinner_dining, size: 30, color: Colors.white)
+                                      ? const Icon(Icons.dinner_dining,
+                                          size: 30, color: Colors.white)
                                       : null,
                                 ),
                                 title: Text(alimento['nome']),
@@ -331,7 +342,8 @@ class CadastroCardapioState extends State<CadastroCardapio> {
                             itemCount: _alimentosJanta.length,
                             itemBuilder: (context, index) {
                               final alimento = _alimentosJanta[index];
-                              final isChecked = selectedJanta.contains(alimento['id']);
+                              final isChecked =
+                                  selectedJanta.contains(alimento['id']);
 
                               return ListTile(
                                 leading: CircleAvatar(
@@ -340,7 +352,8 @@ class CadastroCardapioState extends State<CadastroCardapio> {
                                       ? FileImage(File(alimento['foto']))
                                       : null,
                                   child: alimento['foto'].isEmpty
-                                      ? const Icon(Icons.dinner_dining, size: 30, color: Colors.white)
+                                      ? const Icon(Icons.dinner_dining,
+                                          size: 30, color: Colors.white)
                                       : null,
                                 ),
                                 title: Text(alimento['nome']),
@@ -368,7 +381,8 @@ class CadastroCardapioState extends State<CadastroCardapio> {
                         ),
                         ElevatedButton(
                           style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 40, 106, 86)),
+                            backgroundColor: MaterialStateProperty.all(
+                                const Color.fromARGB(255, 40, 106, 86)),
                           ),
                           onPressed: () async {
                             if (id == null) {
@@ -381,7 +395,8 @@ class CadastroCardapioState extends State<CadastroCardapio> {
 
                             Navigator.of(context).pop();
                           },
-                          child: Text(id == null ? 'Novo cardápio' : 'Atualizar'),
+                          child:
+                              Text(id == null ? 'Novo cardápio' : 'Atualizar'),
                         )
                       ],
                     ),
@@ -402,7 +417,20 @@ class CadastroCardapioState extends State<CadastroCardapio> {
     List<int> jantaList = selectedJanta.toList();
 
     // Insira os alimentos selecionados no banco de dados como parte do novo cardápio.
-    await DatabaseHelper.insereCardapio(usuarioList[0], cafeDaManhaList[0], cafeDaManhaList[1], cafeDaManhaList[2], almocoList[0], almocoList[1], almocoList[2], almocoList[3], almocoList[4], jantaList[0], jantaList[1], jantaList[2], jantaList[3]);
+    await DatabaseHelper.insereCardapio(
+        usuarioList[0],
+        cafeDaManhaList[0],
+        cafeDaManhaList[1],
+        cafeDaManhaList[2],
+        almocoList[0],
+        almocoList[1],
+        almocoList[2],
+        almocoList[3],
+        almocoList[4],
+        jantaList[0],
+        jantaList[1],
+        jantaList[2],
+        jantaList[3]);
     _exibeTodosRegistros();
   }
 
@@ -412,7 +440,21 @@ class CadastroCardapioState extends State<CadastroCardapio> {
     List<int> almocoList = selectedAlmoco.toList();
     List<int> jantaList = selectedJanta.toList();
     // Atualize o cardápio existente com os novos alimentos selecionados.
-    await DatabaseHelper.atualizaCardapio(id, usuarioList[0], cafeDaManhaList[0], cafeDaManhaList[1], cafeDaManhaList[2], almocoList[0], almocoList[1], almocoList[2], almocoList[3], almocoList[4], jantaList[0], jantaList[1], jantaList[2], jantaList[3]);
+    await DatabaseHelper.atualizaCardapio(
+        id,
+        usuarioList[0],
+        cafeDaManhaList[0],
+        cafeDaManhaList[1],
+        cafeDaManhaList[2],
+        almocoList[0],
+        almocoList[1],
+        almocoList[2],
+        almocoList[3],
+        almocoList[4],
+        jantaList[0],
+        jantaList[1],
+        jantaList[2],
+        jantaList[3]);
     _exibeTodosRegistros();
   }
 
@@ -423,9 +465,10 @@ class CadastroCardapioState extends State<CadastroCardapio> {
     ));
     _exibeTodosRegistros();
   }
-  
+
   void _compartilhaRegistro(int cardapioId) {
-    final cardapio = _registros.firstWhere((element) => element['id'] == cardapioId);
+    final cardapio =
+        _registros.firstWhere((element) => element['id'] == cardapioId);
     final usuarioId = cardapio['id_usuario'];
     final cafe1Id = cardapio['cafe1_id'];
     final cafe2Id = cardapio['cafe2_id'];
@@ -440,27 +483,40 @@ class CadastroCardapioState extends State<CadastroCardapio> {
     final janta3Id = cardapio['janta3_id'];
     final janta4Id = cardapio['janta4_id'];
 
-    final usuario = _usuarios.firstWhere((element) => element['id'] == usuarioId);
+    final usuario =
+        _usuarios.firstWhere((element) => element['id'] == usuarioId);
 
-    final cafe1 = _alimentosCafe.firstWhere((element) => element['id'] == cafe1Id);
-    final cafe2 = _alimentosCafe.firstWhere((element) => element['id'] == cafe2Id);
-    final cafe3 = _alimentosCafe.firstWhere((element) => element['id'] == cafe3Id);
+    final cafe1 =
+        _alimentosCafe.firstWhere((element) => element['id'] == cafe1Id);
+    final cafe2 =
+        _alimentosCafe.firstWhere((element) => element['id'] == cafe2Id);
+    final cafe3 =
+        _alimentosCafe.firstWhere((element) => element['id'] == cafe3Id);
 
-    final almoco1 = _alimentosAlmoco.firstWhere((element) => element['id'] == almoco1Id);
-    final almoco2 = _alimentosAlmoco.firstWhere((element) => element['id'] == almoco2Id);
-    final almoco3 = _alimentosAlmoco.firstWhere((element) => element['id'] == almoco3Id);
-    final almoco4 = _alimentosAlmoco.firstWhere((element) => element['id'] == almoco4Id);
-    final almoco5 = _alimentosAlmoco.firstWhere((element) => element['id'] == almoco5Id);
+    final almoco1 =
+        _alimentosAlmoco.firstWhere((element) => element['id'] == almoco1Id);
+    final almoco2 =
+        _alimentosAlmoco.firstWhere((element) => element['id'] == almoco2Id);
+    final almoco3 =
+        _alimentosAlmoco.firstWhere((element) => element['id'] == almoco3Id);
+    final almoco4 =
+        _alimentosAlmoco.firstWhere((element) => element['id'] == almoco4Id);
+    final almoco5 =
+        _alimentosAlmoco.firstWhere((element) => element['id'] == almoco5Id);
 
-    final janta1 = _alimentosJanta.firstWhere((element) => element['id'] == janta1Id);
-    final janta2 = _alimentosJanta.firstWhere((element) => element['id'] == janta2Id);
-    final janta3 = _alimentosJanta.firstWhere((element) => element['id'] == janta3Id);
-    final janta4 = _alimentosJanta.firstWhere((element) => element['id'] == janta4Id);
+    final janta1 =
+        _alimentosJanta.firstWhere((element) => element['id'] == janta1Id);
+    final janta2 =
+        _alimentosJanta.firstWhere((element) => element['id'] == janta2Id);
+    final janta3 =
+        _alimentosJanta.firstWhere((element) => element['id'] == janta3Id);
+    final janta4 =
+        _alimentosJanta.firstWhere((element) => element['id'] == janta4Id);
 
     final shareText = 'Nome: ${usuario['nome']}'
-      '\nOpções para o café da manhã:\n${cafe1['nome']}\n${cafe2['nome']}\n${cafe3['nome']}'
-      '\nOpções para o almoço:\n${almoco1['nome']}\n${almoco2['nome']}\n${almoco3['nome']}\n${almoco4['nome']}\n${almoco5['nome']}'
-      '\nOpções para o jantar:\n${janta1['nome']}\n${janta2['nome']}\n${janta3['nome']}\n${janta4['nome']}';
+        '\nOpções para o café da manhã:\n${cafe1['nome']}\n${cafe2['nome']}\n${cafe3['nome']}'
+        '\nOpções para o almoço:\n${almoco1['nome']}\n${almoco2['nome']}\n${almoco3['nome']}\n${almoco4['nome']}\n${almoco5['nome']}'
+        '\nOpções para o jantar:\n${janta1['nome']}\n${janta2['nome']}\n${janta3['nome']}\n${janta4['nome']}';
 
     Share.share(shareText, subject: 'Dados do Cardápio');
   }
@@ -510,142 +566,165 @@ class CadastroCardapioState extends State<CadastroCardapio> {
               child: CircularProgressIndicator(),
             )
           : Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: TextField(
-                  controller: _searchController,
-                  decoration: const InputDecoration(
-                    labelText: 'Buscar cardapios por nome',
-                    prefixIcon: Icon(Icons.search),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: const InputDecoration(
+                      labelText: 'Buscar cardapios por nome',
+                      prefixIcon: Icon(Icons.search),
+                    ),
                   ),
                 ),
-              ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: _filteredRegistros.length,
-                  itemBuilder: (context, index) {
-                    final cardapio = _filteredRegistros[index];
-                    return Card(
-                      color: const Color.fromARGB(255, 255, 255, 255),
-                      margin: const EdgeInsets.all(7.5),
-                      shape: RoundedRectangleBorder(
-                        side: const BorderSide(color: Color.fromARGB(255, 158, 209, 197), width: 2.0),
-                        borderRadius: BorderRadius.circular(4.0),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ListTile(
-                          tileColor: const Color.fromARGB(255, 255, 255, 255),
-                          title: Text(_usuarios.firstWhere((element) => element['id'] == cardapio['id_usuario'])['nome']),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 8),
-                              const Row(
-                                children: [
-                                  Text('Opções para o café da manhã: ', style: TextStyle(fontWeight: FontWeight.bold))
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Text('${_alimentosCafe.firstWhere((element) => element['id'] == cardapio['cafe1_id'])['nome']}'),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Text('${_alimentosCafe.firstWhere((element) => element['id'] == cardapio['cafe2_id'])['nome']}'),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Text('${_alimentosCafe.firstWhere((element) => element['id'] == cardapio['cafe3_id'])['nome']}'),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              const Row(
-                                children: [
-                                  Text('Opções para o almoço: ', style: TextStyle(fontWeight: FontWeight.bold))
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Text('${_alimentosAlmoco.firstWhere((element) => element['id'] == cardapio['almoco1_id'])['nome']}'),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Text('${_alimentosAlmoco.firstWhere((element) => element['id'] == cardapio['almoco2_id'])['nome'] ?? 'Alimento não encontrado'}'),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Text('${_alimentosAlmoco.firstWhere((element) => element['id'] == cardapio['almoco3_id'])['nome'] ?? 'Alimento não encontrado'}'),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Text('${_alimentosAlmoco.firstWhere((element) => element['id'] == cardapio['almoco4_id'])['nome'] ?? 'Alimento não encontrado'}'),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Text('${_alimentosAlmoco.firstWhere((element) => element['id'] == cardapio['almoco5_id'])['nome'] ?? 'Alimento não encontrado'}'),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              const Row(
-                                children: [
-                                  Text('Opções para o jantar: ', style: TextStyle(fontWeight: FontWeight.bold))
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Text('${_alimentosJanta.firstWhere((element) => element['id'] == cardapio['janta1_id'])['nome'] ?? 'Alimento não encontrado'}'),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Text('${_alimentosJanta.firstWhere((element) => element['id'] == cardapio['janta2_id'])['nome'] ?? 'Alimento não encontrado'}'),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Text('${_alimentosJanta.firstWhere((element) => element['id'] == cardapio['janta3_id'])['nome'] ?? 'Alimento não encontrado'}'),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Text('${_alimentosJanta.firstWhere((element) => element['id'] == cardapio['janta4_id'])['nome'] ?? 'Alimento não encontrado'}'),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                            ],
-                          ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.more_vert),
-                            onPressed: () => _showOptionsModal(cardapio['id']),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: _filteredRegistros.length,
+                    itemBuilder: (context, index) {
+                      final cardapio = _filteredRegistros[index];
+                      return Card(
+                        color: const Color.fromARGB(255, 255, 255, 255),
+                        margin: const EdgeInsets.all(7.5),
+                        shape: RoundedRectangleBorder(
+                          side: const BorderSide(
+                              color: Color.fromARGB(255, 158, 209, 197),
+                              width: 2.0),
+                          borderRadius: BorderRadius.circular(4.0),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ListTile(
+                            tileColor: const Color.fromARGB(255, 255, 255, 255),
+                            title: Text(_usuarios.firstWhere((element) =>
+                                element['id'] ==
+                                cardapio['id_usuario'])['nome']),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 8),
+                                const Row(
+                                  children: [
+                                    Text('Opções para o café da manhã: ',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold))
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Text(
+                                        '${_alimentosCafe.firstWhere((element) => element['id'] == cardapio['cafe1_id'])['nome']}'),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Text(
+                                        '${_alimentosCafe.firstWhere((element) => element['id'] == cardapio['cafe2_id'])['nome']}'),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Text(
+                                        '${_alimentosCafe.firstWhere((element) => element['id'] == cardapio['cafe3_id'])['nome']}'),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                const Row(
+                                  children: [
+                                    Text('Opções para o almoço: ',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold))
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Text(
+                                        '${_alimentosAlmoco.firstWhere((element) => element['id'] == cardapio['almoco1_id'])['nome']}'),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Text(
+                                        '${_alimentosAlmoco.firstWhere((element) => element['id'] == cardapio['almoco2_id'])['nome'] ?? 'Alimento não encontrado'}'),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Text(
+                                        '${_alimentosAlmoco.firstWhere((element) => element['id'] == cardapio['almoco3_id'])['nome'] ?? 'Alimento não encontrado'}'),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Text(
+                                        '${_alimentosAlmoco.firstWhere((element) => element['id'] == cardapio['almoco4_id'])['nome'] ?? 'Alimento não encontrado'}'),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Text(
+                                        '${_alimentosAlmoco.firstWhere((element) => element['id'] == cardapio['almoco5_id'])['nome'] ?? 'Alimento não encontrado'}'),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                const Row(
+                                  children: [
+                                    Text('Opções para o jantar: ',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold))
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Text(
+                                        '${_alimentosJanta.firstWhere((element) => element['id'] == cardapio['janta1_id'])['nome'] ?? 'Alimento não encontrado'}'),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Text(
+                                        '${_alimentosJanta.firstWhere((element) => element['id'] == cardapio['janta2_id'])['nome'] ?? 'Alimento não encontrado'}'),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Text(
+                                        '${_alimentosJanta.firstWhere((element) => element['id'] == cardapio['janta3_id'])['nome'] ?? 'Alimento não encontrado'}'),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Text(
+                                        '${_alimentosJanta.firstWhere((element) => element['id'] == cardapio['janta4_id'])['nome'] ?? 'Alimento não encontrado'}'),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                              ],
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.more_vert),
+                              onPressed: () =>
+                                  _showOptionsModal(cardapio['id']),
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color.fromARGB(255, 40, 106, 86),
         child: const Icon(Icons.add),

@@ -35,107 +35,110 @@ class _CustomDrawerState extends State<CustomDrawer> {
       });
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
       backgroundColor: const Color.fromARGB(255, 158, 209, 197),
-        child: ListView(
-          children: <Widget>[
-            SizedBox(
-              height: 200, // Altura do cabeçalho personalizado
-              child: DrawerHeader(
-                decoration: const BoxDecoration(
-                  color: Color.fromARGB(255, 255, 255, 255), // Cor de fundo do cabeçalho
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Image.asset(
-                      'assets/images/logo-app.png', // Substitua pelo caminho da sua imagem de logotipo
+      child: ListView(
+        children: <Widget>[
+          SizedBox(
+            height: 200, // Altura do cabeçalho personalizado
+            child: DrawerHeader(
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(
+                    255, 255, 255, 255), // Cor de fundo do cabeçalho
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Image.asset(
+                    'assets/images/logo-app.png', // Substitua pelo caminho da sua imagem de logotipo
+                  ),
+                  CircleAvatar(
+                    radius:
+                        25, // Ajuste o raio para controlar o tamanho do CircleAvatar
+                    backgroundImage: userData!['foto'].isNotEmpty
+                        ? FileImage(File(userData!['foto']))
+                        : null,
+                    child: userData!['foto'].isEmpty
+                        ? const Icon(Icons.person,
+                            size: 25, color: Colors.white)
+                        : null,
+                  ),
+                  Text(
+                    userData!['nome'],
+                    style: const TextStyle(
+                      color: Color.fromARGB(255, 40, 106, 86),
+                      // verde escuro logo
+                      // color: Color.fromARGB(255, 131, 196, 181),
+                      // verde claro
+                      // color: Color.fromARGB(255, 158, 209, 197),
+                      fontSize: 20,
                     ),
-                    CircleAvatar(
-                      radius: 25, // Ajuste o raio para controlar o tamanho do CircleAvatar
-                      backgroundImage: userData!['foto'].isNotEmpty
-                          ? FileImage(File(userData!['foto']))
-                          : null,
-                      child: userData!['foto'].isEmpty
-                          ? const Icon(Icons.person, size: 25, color: Colors.white)
-                          : null,
-                    ),
-                    Text(
-                      userData!['nome'],
-                      style: const TextStyle(
-                        color: Color.fromARGB(255, 40, 106, 86),
-                        // verde escuro logo
-                        // color: Color.fromARGB(255, 131, 196, 181),
-                        // verde claro
-                        // color: Color.fromARGB(255, 158, 209, 197),
-                        fontSize: 20,
-                      ),
-                    )
-                  ],
-                ),
+                  )
+                ],
               ),
             ),
-            ListTile(
-              title: const Text(
-                  'Home',     
-                  style: TextStyle(
-                    fontSize: 20, // Altere o tamanho da fonte desejado aqui
-                  ),
-              ),
-              textColor: const Color.fromARGB(255, 255, 255, 255),
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const Home(),
-                ));
-              },
-            ),
-            ListTile(
-              title: const Text(
-                  'Cadastro de Usuário',     
-                  style: TextStyle(
-                    fontSize: 20,
-                  ),
-              ),
-              textColor: const Color.fromARGB(255, 255, 255, 255),
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const CadastroUsuario(),
-                ));
-              },
-            ),
-            ListTile(
-              title: const Text(
-                  'Créditos',     
-                  style: TextStyle(
-                    fontSize: 20,
-                  ),
-              ),
-              textColor: const Color.fromARGB(255, 255, 255, 255),
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const Creditos(),
-                ));
-              },
-            ),
-            ListTile(
+          ),
+          ListTile(
             title: const Text(
-                  'Sair',     
-                  style: TextStyle(
-                    fontSize: 20, // Altere o tamanho da fonte desejado aqui
-                  ),
+              'Home',
+              style: TextStyle(
+                fontSize: 20, // Altere o tamanho da fonte desejado aqui
               ),
-              textColor: const Color.fromARGB(255, 255, 255, 255),
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const Login(),
-                ));
-              },
             ),
-          ],
-        ),
+            textColor: const Color.fromARGB(255, 255, 255, 255),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const Home(),
+              ));
+            },
+          ),
+          ListTile(
+            title: const Text(
+              'Cadastro de Usuário',
+              style: TextStyle(
+                fontSize: 20,
+              ),
+            ),
+            textColor: const Color.fromARGB(255, 255, 255, 255),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const CadastroUsuario(),
+              ));
+            },
+          ),
+          ListTile(
+            title: const Text(
+              'Créditos',
+              style: TextStyle(
+                fontSize: 20,
+              ),
+            ),
+            textColor: const Color.fromARGB(255, 255, 255, 255),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const Creditos(),
+              ));
+            },
+          ),
+          ListTile(
+            title: const Text(
+              'Sair',
+              style: TextStyle(
+                fontSize: 20, // Altere o tamanho da fonte desejado aqui
+              ),
+            ),
+            textColor: const Color.fromARGB(255, 255, 255, 255),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const Login(),
+              ));
+            },
+          ),
+        ],
+      ),
     );
   }
 }

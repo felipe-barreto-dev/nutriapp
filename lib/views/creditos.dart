@@ -24,7 +24,7 @@ class CreditosState extends State<Creditos> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
-              'Projeto desenvolvido para a disciplina de Programação para Dispositivos Móveis. Professor: Luiz Felipe.\nIntegrantes do grupo:',
+              'Projeto desenvolvido para a disciplina de Programação para Dispositivos Móveis. Professor: Luiz Felipe.\n\nIntegrantes do grupo:',
               textAlign: TextAlign.justify,
               style: TextStyle(
                 fontSize: 18, // Ajuste o tamanho da fonte conforme desejado

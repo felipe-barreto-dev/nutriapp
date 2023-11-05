@@ -20,13 +20,30 @@ class LoginState extends State<Login> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _birthdayDateController = TextEditingController();
   final TextEditingController _photoController = TextEditingController();
+  String? _errorText;
 
   late DateTime _selectedDate;
 
   Future<void> _insereRegistro() async {
-    await DatabaseHelper.insereUsuario(
-        _nameController.text, _selectedDate, _photoController.text);
-    _exibeTodosRegistros();
+    if (_nameController.text.isEmpty || _birthdayDateController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Nome e Data de Nascimento são obrigatórios.'),
+      ));
+    } else {
+      await DatabaseHelper.insereUsuario(
+          _nameController.text, _selectedDate, _photoController.text);
+      _exibeTodosRegistros();
+
+      // Limpa os campos
+      _nameController.text = '';
+      _birthdayDateController.text = '';
+      _photoController.text = '';
+
+      // Atualiza o índice para 0 (tela de login) após o cadastro bem-sucedido
+      setState(() {
+        _currentIndex = 0;
+      });
+    }
   }
 
   void _exibeTodosRegistros() async {
@@ -64,7 +81,7 @@ class LoginState extends State<Login> {
   Widget _buildUserList() {
     return ListView.builder(
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: BouncingScrollPhysics(),
       itemCount: _registros.length,
       itemBuilder: (context, index) {
         final usuario = _registros[index];
@@ -108,6 +125,10 @@ class LoginState extends State<Login> {
   Future<void> _selectDate(BuildContext context) async {
     final DateTime now = DateTime.now();
     final DateTime initialDate = DateTime(1900);
+
+    // Redefine a data selecionada para a data atual
+    _selectedDate = now;
+
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate:
@@ -125,134 +146,6 @@ class LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> _telas = [
-      WillPopScope(
-        onWillPop: () async {
-          if (_currentIndex == 1) {
-            // Se estiver na tela de cadastro, retorne para a tela de login
-            setState(() {
-              _currentIndex = 0;
-            });
-            return false;
-          } else {
-            // Se estiver na tela de login, exiba o diálogo de confirmação para sair do aplicativo
-            return (await showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text('Sair do aplicativo?'),
-                    content:
-                        Text('Você tem certeza que deseja sair do aplicativo?'),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(false),
-                        child: Text('Cancelar'),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(true),
-                        child: Text('Sair'),
-                      ),
-                    ],
-                  ),
-                )) ??
-                false;
-          }
-        },
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Image.asset(
-                'assets/images/logo+name.png',
-              ),
-              const Divider(
-                thickness: 1,
-                color: Color.fromARGB(255, 255, 255, 255),
-              ),
-              const Text(
-                'Selecione ou crie um usuário abaixo:',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 20,
-                  color: Color.fromARGB(255, 40, 106, 86),
-                ),
-              ),
-              if (_isLoading) CircularProgressIndicator(),
-              if (!_isLoading && _registros.isEmpty)
-                Text("Nenhum usuário cadastrado"),
-              if (!_isLoading && _registros.isNotEmpty) _buildUserList(),
-            ],
-          ),
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.all(30.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              width: 120,
-              height: 120,
-              child: CircleAvatar(
-                radius: 60,
-                backgroundImage: _photoController.text.isNotEmpty
-                    ? FileImage(File(_photoController.text))
-                    : null,
-                child: _photoController.text.isEmpty
-                    ? const Icon(Icons.person, size: 60, color: Colors.white)
-                    : null,
-              ),
-            ),
-            ElevatedButton(
-                onPressed: _pickImage,
-                style: const ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(
-                        Color.fromARGB(255, 40, 106, 86))),
-                child: const Text('Escolher Foto')),
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Nome'),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            TextFormField(
-              controller: _birthdayDateController,
-              readOnly: true,
-              decoration: InputDecoration(
-                hintText: 'Data de Nascimento',
-                suffixIcon: IconButton(
-                  onPressed: () => _selectDate(context),
-                  icon: const Icon(Icons.calendar_today),
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            ElevatedButton(
-              style: const ButtonStyle(
-                  backgroundColor: MaterialStatePropertyAll(
-                      Color.fromARGB(255, 40, 106, 86))),
-              onPressed: () async {
-                await _insereRegistro();
-
-                // Limpa os campos
-                _nameController.text = '';
-                _birthdayDateController.text = '';
-                _photoController.text = '';
-
-                // Atualiza o índice para 0 (tela de login)
-                setState(() {
-                  _currentIndex = 0;
-                });
-              },
-              child: Text('Novo usuário'),
-            )
-          ],
-        ),
-      ),
-    ];
-
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 158, 209, 197),
       appBar: AppBar(
@@ -271,9 +164,9 @@ class LoginState extends State<Login> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        backgroundColor: const Color.fromARGB(255, 131, 196, 181),
-        unselectedItemColor: const Color.fromARGB(255, 40, 106, 86),
-        selectedItemColor: Colors.white,
+        backgroundColor: Color.fromARGB(255, 202, 240, 231),
+        unselectedItemColor: Colors.grey,
+        selectedItemColor: const Color.fromARGB(255, 40, 106, 86),
         onTap: (index) {
           setState(() {
             _currentIndex = index;
@@ -290,7 +183,109 @@ class LoginState extends State<Login> {
           ),
         ],
       ),
-      body: _telas[_currentIndex],
+      body: _currentIndex == 0
+          ? _buildLoginScreen()
+          : _currentIndex == 1
+              ? _buildCadastroScreen()
+              : null,
+    );
+  }
+
+  Widget _buildLoginScreen() {
+    return Column(
+      children: [
+        Image.asset('assets/images/logo+name.png'),
+        const Divider(
+          thickness: 1,
+          color: Color.fromARGB(255, 255, 255, 255),
+        ),
+        const Text(
+          'Selecione ou crie um usuário abaixo:\n',
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 20,
+            color: Color.fromARGB(255, 40, 106, 86),
+          ),
+        ),
+        if (_isLoading) CircularProgressIndicator(),
+        if (!_isLoading && _registros.isEmpty)
+          Text("Nenhum usuário cadastrado"),
+        if (!_isLoading && _registros.isNotEmpty)
+          Expanded(child: _buildUserList()),
+      ],
+    );
+  }
+
+  Widget _buildCadastroScreen() {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(30.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 120,
+              height: 120,
+              child: CircleAvatar(
+                radius: 60,
+                backgroundImage: _photoController.text.isNotEmpty
+                    ? FileImage(File(_photoController.text))
+                    : null,
+                child: _photoController.text.isEmpty
+                    ? Icon(Icons.person, size: 60, color: Colors.white)
+                    : null,
+              ),
+            ),
+            ElevatedButton(
+              onPressed: _pickImage,
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(
+                  Color.fromARGB(255, 40, 106, 86),
+                ),
+              ),
+              child: const Text('Escolher Foto'),
+            ),
+            TextField(
+              controller: _nameController,
+              decoration: const InputDecoration(labelText: 'Nome'),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            TextFormField(
+              controller: _birthdayDateController,
+              readOnly: true,
+              decoration: InputDecoration(
+                hintText: 'Data de Nascimento',
+                suffixIcon: IconButton(
+                  onPressed: () => _selectDate(context),
+                  icon: const Icon(Icons.calendar_today),
+                ),
+              ),
+            ),
+            if (_errorText != null)
+              Text(
+                _errorText!,
+                style: TextStyle(color: Colors.red),
+              ),
+            const SizedBox(
+              height: 20,
+            ),
+            ElevatedButton(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(
+                  Color.fromARGB(255, 40, 106, 86),
+                ),
+              ),
+              onPressed: () async {
+                await _insereRegistro();
+              },
+              child: Text('Novo usuário'),
+            )
+          ],
+        ),
+      ),
     );
   }
 }

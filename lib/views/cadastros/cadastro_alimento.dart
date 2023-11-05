@@ -6,7 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
 const List<String> categorias = <String>['Café', 'Almoço', 'Janta'];
-const List<String> tipos = <String>['Bebida', 'Proteína', 'Carboidrato', 'Fruta', 'Grão'];
+const List<String> tipos = <String>[
+  'Bebida',
+  'Proteína',
+  'Carboidrato',
+  'Fruta',
+  'Grão',
+  'Salada'
+];
+
 class CadastroAlimento extends StatefulWidget {
   const CadastroAlimento({super.key});
 
@@ -20,7 +28,8 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
   List<Map<String, dynamic>> _filteredRegistros = []; // Lista filtrada
   bool _isLoading = false;
 
-  final TextEditingController _searchController = TextEditingController(); // Controlador do campo de busca
+  final TextEditingController _searchController =
+      TextEditingController(); // Controlador do campo de busca
 
   //Essa função retorna todos os registros da tabela
   void _exibeTodosRegistros() async {
@@ -40,13 +49,13 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
     _searchController.addListener(_onSearchChanged);
   }
 
-  
   void _onSearchChanged() {
     // Filtra a lista de registros com base no texto digitado no campo de busca
     final searchText = _searchController.text.toLowerCase();
     setState(() {
       _filteredRegistros = _registros
-          .where((registro) => registro['nome'].toLowerCase().contains(searchText))
+          .where(
+              (registro) => registro['nome'].toLowerCase().contains(searchText))
           .toList();
     });
   }
@@ -62,15 +71,15 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
       initialSelection: _categoryController,
       onSelected: (String? newValue) {
         setState(() {
-          _categoryController = newValue!; 
+          _categoryController = newValue!;
         });
       },
-      dropdownMenuEntries: categorias.map<DropdownMenuEntry<String>>((String value) {
+      dropdownMenuEntries:
+          categorias.map<DropdownMenuEntry<String>>((String value) {
         return DropdownMenuEntry<String>(value: value, label: value);
       }).toList(),
     );
   }
-
 
   Widget _buildTipoSelector() {
     return DropdownMenu<String>(
@@ -78,7 +87,7 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
       width: MediaQuery.of(context).size.width - 30,
       onSelected: (String? newValue) {
         setState(() {
-          _typeController = newValue!; 
+          _typeController = newValue!;
         });
       },
       dropdownMenuEntries: tipos.map<DropdownMenuEntry<String>>((String value) {
@@ -89,7 +98,8 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
 
   void _showForm(int? id) async {
     if (id != null) {
-      final registroExistente = _registros.firstWhere((element) => element['id'] == id);
+      final registroExistente =
+          _registros.firstWhere((element) => element['id'] == id);
       _nameController.text = registroExistente['nome'];
       _categoryController = registroExistente['categoria'];
       _photoController.text = registroExistente['foto'];
@@ -98,13 +108,34 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
 
     Future<void> _pickImage() async {
       final imagePicker = ImagePicker();
-      final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+      final pickedFile =
+          await imagePicker.pickImage(source: ImageSource.gallery);
 
       if (pickedFile != null) {
         setState(() {
           _photoController.text = pickedFile.path;
         });
       }
+    }
+
+    void _showErrorDialog(String errorMessage) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Erro"),
+            content: Text(errorMessage),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
     }
 
     showModalBottomSheet(
@@ -131,13 +162,16 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
                     ? FileImage(File(_photoController.text))
                     : null,
                 child: _photoController.text.isEmpty
-                    ? const Icon(Icons.dinner_dining, size: 60, color: Colors.white)
+                    ? const Icon(Icons.dinner_dining,
+                        size: 60, color: Colors.white)
                     : null,
               ),
             ),
             ElevatedButton(
-              onPressed: _pickImage, // Chama a função para selecionar uma imagem
-              style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color.fromARGB(255, 40, 106, 86))),
+              onPressed: _pickImage,
+              style: const ButtonStyle(
+                  backgroundColor: MaterialStatePropertyAll(
+                      Color.fromARGB(255, 40, 106, 86))),
               child: const Text('Escolher Foto'),
             ),
             const SizedBox(height: 10),
@@ -146,17 +180,27 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
               decoration: const InputDecoration(labelText: 'Nome'),
             ),
             const SizedBox(height: 20),
-            const Text('Categoria', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text('Categoria',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 20),
-            _buildCategoriaSelector(), // Adicione aqui o DropdownButton de Categoria
+            _buildCategoriaSelector(),
             const SizedBox(height: 20),
-            const Text('Tipo', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.start),
+            const Text('Tipo',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.start),
             const SizedBox(height: 20),
-            _buildTipoSelector(), // Adicione aqui o DropdownButton de Tipo
+            _buildTipoSelector(),
             const SizedBox(height: 20),
             ElevatedButton(
-              style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Color.fromARGB(255, 40, 106, 86))),
+              style: const ButtonStyle(
+                  backgroundColor: MaterialStatePropertyAll(
+                      Color.fromARGB(255, 40, 106, 86))),
               onPressed: () async {
+                if (_nameController.text.isEmpty) {
+                  _showErrorDialog("Nome do alimento é obrigatório.");
+                  return;
+                }
+
                 if (id == null) {
                   await _insereRegistro();
                 }
@@ -184,15 +228,15 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
 
   // Insere um novo registro
   Future<void> _insereRegistro() async {
-    await DatabaseHelper.insereAlimento(
-        _nameController.text, _photoController.text, _categoryController, _typeController);
+    await DatabaseHelper.insereAlimento(_nameController.text,
+        _photoController.text, _categoryController, _typeController);
     _exibeTodosRegistros();
   }
 
   // Atualiza um registro
   Future<void> _atualizaRegistro(int id) async {
-    await DatabaseHelper.atualizaAlimento(
-        id, _nameController.text, _photoController.text, _categoryController, _typeController);
+    await DatabaseHelper.atualizaAlimento(id, _nameController.text,
+        _photoController.text, _categoryController, _typeController);
     _exibeTodosRegistros();
   }
 
@@ -204,54 +248,58 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
     ));
     _exibeTodosRegistros();
   }
-  
-    void _compartilhaRegistro(int foodId) {
-      final alimento = _registros.firstWhere((element) => element['id'] == foodId);
-      final foodName = alimento['nome'];
-      final foodCategory = alimento['categoria'];
-      final foodType = alimento['tipo'];
 
-      final shareText = 'Nome: $foodName\nCategoria: $foodCategory\nTipo: $foodType';
+  void _compartilhaRegistro(int foodId) {
+    final alimento =
+        _registros.firstWhere((element) => element['id'] == foodId);
+    final foodName = alimento['nome'];
+    final foodCategory = alimento['categoria'];
+    final foodType = alimento['tipo'];
 
-      Share.share(shareText, subject: 'Dados do Alimento'); // Compartilha os dados do alimento
-    }
+    final shareText =
+        'Nome: $foodName\nCategoria: $foodCategory\nTipo: $foodType';
 
-    void _showOptionsModal(int id) {
-      showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.edit),
-                title: const Text('Editar'),
-                onTap: () {
-                  Navigator.pop(context); // Fecha o modal
-                  _showForm(id); // Abre o formulário de edição
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.delete),
-                title: const Text('Deletar'),
-                onTap: () {
-                  Navigator.pop(context); // Fecha o modal
-                  _removeRegistro(id); // Remove o registro
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.share),
-                title: const Text('Compartilhar'),
-                onTap: () {
-                  Navigator.pop(context); // Fecha o modal
-                  _compartilhaRegistro(id); // Implemente a lógica de compartilhamento
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
+    Share.share(shareText,
+        subject: 'Dados do Alimento'); // Compartilha os dados do alimento
+  }
+
+  void _showOptionsModal(int id) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.edit),
+              title: const Text('Editar'),
+              onTap: () {
+                Navigator.pop(context); // Fecha o modal
+                _showForm(id); // Abre o formulário de edição
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete),
+              title: const Text('Deletar'),
+              onTap: () {
+                Navigator.pop(context); // Fecha o modal
+                _removeRegistro(id); // Remove o registro
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.share),
+              title: const Text('Compartilhar'),
+              onTap: () {
+                Navigator.pop(context); // Fecha o modal
+                _compartilhaRegistro(
+                    id); // Implemente a lógica de compartilhamento
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -261,78 +309,91 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
               child: CircularProgressIndicator(),
             )
           : Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: TextField(
-                  controller: _searchController,
-                  decoration: const InputDecoration(
-                    labelText: 'Buscar alimentos por nome',
-                    prefixIcon: Icon(Icons.search),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: const InputDecoration(
+                      labelText: 'Buscar alimentos por nome',
+                      prefixIcon: Icon(Icons.search),
+                    ),
                   ),
                 ),
-              ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: _filteredRegistros.length,
-                  itemBuilder: (context, index) {
-                    final alimento = _filteredRegistros[index];
-                    final String photoPath = alimento['foto'];
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: _filteredRegistros.length,
+                    itemBuilder: (context, index) {
+                      final alimento = _filteredRegistros[index];
+                      final String photoPath = alimento['foto'];
 
-                    return Card(
-                      color: const Color.fromARGB(255, 255, 255, 255),
-                      margin: const EdgeInsets.all(7.5),
-                      shape: RoundedRectangleBorder(
-                        side: const BorderSide(color: Color.fromARGB(255, 158, 209, 197), width: 2.0),
-                        borderRadius: BorderRadius.circular(4.0),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ListTile(
-                          tileColor: const Color.fromARGB(255, 255, 255, 255),
-                          leading: SizedBox(
-                            width: 72.0,
-                            height: 72.0,
-                            child: CircleAvatar(
-                              backgroundColor: const Color.fromARGB(255, 40, 106, 86),
-                              backgroundImage: photoPath.isNotEmpty
-                                  ? FileImage(File(photoPath))
-                                  : null,
-                              child: !photoPath.isNotEmpty
-                                  ? const Icon(Icons.dinner_dining, size: 30, color: Colors.white)
-                                  : null,
+                      return Card(
+                        color: const Color.fromARGB(255, 255, 255, 255),
+                        margin: const EdgeInsets.all(7.5),
+                        shape: RoundedRectangleBorder(
+                          side: const BorderSide(
+                              color: Color.fromARGB(255, 158, 209, 197),
+                              width: 2.0),
+                          borderRadius: BorderRadius.circular(4.0),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ListTile(
+                            tileColor: const Color.fromARGB(255, 255, 255, 255),
+                            leading: SizedBox(
+                              width: 72.0,
+                              height: 72.0,
+                              child: CircleAvatar(
+                                backgroundColor:
+                                    const Color.fromARGB(255, 40, 106, 86),
+                                backgroundImage: photoPath.isNotEmpty
+                                    ? FileImage(File(photoPath))
+                                    : null,
+                                child: !photoPath.isNotEmpty
+                                    ? const Icon(Icons.dinner_dining,
+                                        size: 30, color: Colors.white)
+                                    : null,
+                              ),
+                            ),
+                            title: Text(alimento['nome']),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Text(
+                                      'Categoria: ',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text('${alimento['categoria']}'),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    const Text(
+                                      'Tipo: ',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text('${alimento['tipo']}'),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.more_vert),
+                              onPressed: () =>
+                                  _showOptionsModal(alimento['id']),
                             ),
                           ),
-                          title: Text(alimento['nome']),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  const Text('Categoria: ', style: TextStyle(fontWeight: FontWeight.bold),),
-                                  Text('${alimento['categoria']}'),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  const Text('Tipo: ', style: TextStyle(fontWeight: FontWeight.bold),),
-                                  Text('${alimento['tipo']}'),
-                                ],
-                              ),
-                            ],
-                          ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.more_vert),
-                            onPressed: () => _showOptionsModal(alimento['id']),
-                          ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color.fromARGB(255, 40, 106, 86),
         child: const Icon(Icons.add),

@@ -37,13 +37,24 @@ class Home extends StatefulWidget {
 }
 
 class HomeState extends State<Home> {
-
   int _currentIndex = 0; // Índice da aba ativa
   Map<String, dynamic>? userData;
 
   final List<Widget> _telas = [
-    const CadastroAlimento(),
-    const CadastroCardapio(),
+    Card(
+      margin: const EdgeInsets.symmetric(vertical: 4.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(90.0), // Define o raio dos cantos
+      ),
+      child: const CadastroAlimento(),
+    ),
+    Card(
+      margin: const EdgeInsets.symmetric(vertical: 4.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(90.0), // Define o raio dos cantos
+      ),
+      child: const CadastroCardapio(),
+    ),
   ]; // Lista de telas para os diferentes tipos de cadastro
 
   void _getCurrentUser() async {
@@ -64,34 +75,43 @@ class HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('NutriPlus'),
-        backgroundColor: const Color.fromARGB(255, 131, 196, 181),
-      ),
-      body: _telas[_currentIndex], // Exibe a tela correspondente à aba ativa
-      drawer: CustomDrawer(currentIndex: _currentIndex),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex, // Índice da aba ativa
-        backgroundColor: const Color.fromARGB(255, 131, 196, 181),
-        unselectedItemColor: const Color.fromARGB(255, 40, 106, 86), // Set unselected items to white
-        selectedItemColor: Colors.white, // Set selected items to dark green
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index; // Atualiza a aba ativa ao tocar em um item do BottomNavigationBar
-          });
+    return WillPopScope(
+        onWillPop: () async {
+          // Implemente a lógica para retornar à tela de login
+          Get.off(Login()); // Isso irá navegar para a tela de login
+          return false; // Impede a ação de retorno padrão
         },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.fastfood),
-            label: 'Alimento',
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('NutriPlus'),
+            backgroundColor: const Color.fromARGB(255, 131, 196, 181),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.restaurant_menu),
-            label: 'Cardápio',
+          body:
+              _telas[_currentIndex], // Exibe a tela correspondente à aba ativa
+          drawer: CustomDrawer(currentIndex: _currentIndex),
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: _currentIndex, // Índice da aba ativa
+            backgroundColor: const Color.fromARGB(255, 131, 196, 181),
+            unselectedItemColor: const Color.fromARGB(255, 40, 106, 86),
+            selectedItemColor:
+                Colors.white, // Altera a cor dos itens sem seleção para verde
+            onTap: (index) {
+              setState(() {
+                _currentIndex =
+                    index; // Atualiza a aba ativa ao tocar em um item do BottomNavigationBar
+              });
+            },
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.fastfood),
+                label: 'Alimento',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.restaurant_menu),
+                label: 'Cardápio',
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+        ));
   }
 }
