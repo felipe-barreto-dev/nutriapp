@@ -87,9 +87,13 @@ class LoginState extends State<Login> {
                   width: 50.0,
                   height: 50.0,
                   child: CircleAvatar(
-                    backgroundImage: FileImage(
-                      File(usuario['foto']),
-                    ),
+                    radius: 40,
+                    backgroundImage: usuario['foto'].isNotEmpty
+                        ? FileImage(File(usuario['foto']))
+                        : null,
+                    child: usuario['foto'].isEmpty
+                        ? const Icon(Icons.person, size: 30, color: Colors.white)
+                        : null,
                   ),
                 ),
                 title: Text(usuario['nome']),
@@ -167,7 +171,7 @@ class LoginState extends State<Login> {
               width: 120, // Defina a largura desejada para o Container
               height: 120, // Defina a altura desejada para o Container
               child: CircleAvatar(
-                radius: 60, // Ajuste o raio para controlar o tamanho do CircleAvatar
+                radius: 60,
                 backgroundImage: _photoController.text.isNotEmpty
                     ? FileImage(File(_photoController.text))
                     : null,

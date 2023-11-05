@@ -205,13 +205,15 @@ class CadastroAlimentoState extends State<CadastroAlimento> {
     _exibeTodosRegistros();
   }
   
-    void _compartilhaRegistro(int userId) {
-      final usuario = _registros.firstWhere((element) => element['id'] == userId);
-      final userName = usuario['nome'];
+    void _compartilhaRegistro(int foodId) {
+      final alimento = _registros.firstWhere((element) => element['id'] == foodId);
+      final foodName = alimento['nome'];
+      final foodCategory = alimento['categoria'];
+      final foodType = alimento['tipo'];
 
-      final shareText = 'Nome: $userName\nIdade: anos';
+      final shareText = 'Nome: $foodName\nCategoria: $foodCategory\nTipo: $foodType';
 
-      Share.share(shareText, subject: 'Dados do Usuário'); // Compartilha os dados do usuário
+      Share.share(shareText, subject: 'Dados do Alimento'); // Compartilha os dados do alimento
     }
 
     void _showOptionsModal(int id) {
