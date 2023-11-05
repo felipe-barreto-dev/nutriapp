@@ -29,12 +29,6 @@ class LoginState extends State<Login> {
     _exibeTodosRegistros();
   }
 
-  Future<void> _atualizaRegistro(int id) async {
-    await DatabaseHelper.atualizaUsuario(
-        id, _nameController.text, _selectedDate, _photoController.text);
-    _exibeTodosRegistros();
-  }
-
   void _exibeTodosRegistros() async {
     final data = await DatabaseHelper.exibeTodosUsuarios();
     setState(() {
@@ -217,9 +211,6 @@ class LoginState extends State<Login> {
             TextField(
               controller: _nameController,
               decoration: const InputDecoration(labelText: 'Nome'),
-            ),
-            const SizedBox(
-              height: 10,
             ),
             const SizedBox(
               height: 10,
